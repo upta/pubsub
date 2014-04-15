@@ -1,4 +1,4 @@
-pubsub
+PubSub PCL
 ======
 
 An extremely light-weight, easy to use PCL pub/sub library

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>PubSub</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>upta</authors>
+    <owners>upta</owners>
+    <projectUrl>http://github.com/upta/pubsub</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>c# PCL portable pubsub eventaggregator</tags>
+    <description>
+      An extremely light-weight, easy to use PCL pub/sub library
+    </description>
+  </metadata>
+</package>
