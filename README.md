@@ -11,6 +11,7 @@ An extremely light-weight, easy to use PCL pub/sub library
 
 	Install-Package PubSub
 
+![nuget dialog image for PubSub PCL](http://i.imgur.com/jH6ONPg.png "Nuget dialog for PubSub PCL")
 ###How to use it
 First, add a using.
 
