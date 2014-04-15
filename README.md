@@ -7,6 +7,10 @@ An extremely light-weight, easy to use PCL pub/sub library
 * It should be portable so it can be used pretty much wherever
 * Make it stupid simple to use with zero setup
 
+###Get it on Nuget
+
+	Install-Package PubSub
+
 ###How to use it
 First, add a using.
 
