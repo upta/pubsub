@@ -2,15 +2,18 @@
 <package>
   <metadata>
     <id>PubSub</id>
-    <version>$version$</version>
-    <title>$title$</title>
+    <version>1.0</version>
+    <title>PubSub PCL</title>
     <authors>upta</authors>
     <owners>upta</owners>
     <projectUrl>http://github.com/upta/pubsub</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <tags>c# PCL portable pubsub eventaggregator</tags>
+    <tags>PCL portable pubsub eventaggregator c#</tags>
     <description>
       An extremely light-weight, easy to use PCL pub/sub library
     </description>
   </metadata>
+  <files>
+    <file src="bin\Release\PubSub.dll" target="lib/portable-net45+netcore45+wp8+MonoAndroid1+MonoTouch1" />
+  </files>
 </package>
