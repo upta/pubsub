@@ -56,3 +56,6 @@ To keep things simple, yet flexible, PubSub PCL is implemented using two core id
 	- This gives us nice strongly-typed data that can be passed from our Publish methods to our Subscribe handlers (i.e. Product above)
 * All interaction with the PubSub system is done through extention methods on System.Object (e.g. Publish, Subscribe and Unsubscribe)
 	- This allows for a zero-setup system, you can simply Subscribe on any object and Publish away
+
+###Questions? Thoughts?
+Feel free to post stuff to the [issues](https://github.com/upta/pubsub/issues) page or hit me up on Twitter [@brianupta](https://twitter.com/brianupta)
