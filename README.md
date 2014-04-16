@@ -14,42 +14,49 @@ An extremely light-weight, easy to use PCL pub/sub library
 ![nuget dialog image for PubSub PCL](http://i.imgur.com/jH6ONPg.png "Nuget dialog for PubSub PCL")
 ###How to use it
 First, add a using.
-
-	using PubSub;
+```c#
+using PubSub;
+```
 
 Listen for stuff you might be interested in.
 
-	public class Page
+```c#
+public class Page
+{
+	public Page()
 	{
-		public Page()
+		this.Subscribe<Product>( product =>
 		{
-			this.Subscribe<Product>( product =>
-			{
-				// highly interesting things
-			});
-		}
+			// highly interesting things
+		});
 	}
-	
+}
+```
+
 Tell others that interesting things happened.
 
-	public class OtherPage
+```c#
+public class OtherPage
+{
+	public void ProductPurchased()
 	{
-		public void ProductPurchased()
-		{
-			this.Publish( new Product() );
-		}
+		this.Publish( new Product() );
 	}
-	
+}
+```
+
 Stop listening when you don't care anymore.
 
-	public class Page
+```c#
+public class Page
+{
+	public void WereDoneHere()
 	{
-		public void WereDoneHere()
-		{
-			this.Unsubscribe<Product>();
-		}
+		this.Unsubscribe<Product>();
 	}
-	
+}
+```
+
 ###Some explanation
 To keep things simple, yet flexible, PubSub PCL is implemented using two core ideas:
 * Different kinds of messages are delineated by CLR type.
