@@ -76,5 +76,13 @@ To keep things simple, yet flexible, PubSub PCL is implemented using two core id
 
 ![nuget dialog image for PubSub PCL](http://i.imgur.com/jH6ONPg.png "Nuget dialog for PubSub PCL")
 
+###Currently supported platforms
+* .Net Framwork 4.5 / 4.5.1
+* Windows 8 / 8.1
+* Windows Phone Silverlight 8 / 8.1
+* Silverlight 5
+* Xamarin.Android
+* Xamarin.iOS
+
 ###Questions? Thoughts?
 Feel free to post stuff to the [issues](https://github.com/upta/pubsub/issues) page or hit me up on Twitter [@brianupta](https://twitter.com/brianupta)
