@@ -7,11 +7,16 @@ An extremely light-weight, easy to use PCL pub/sub library
 * It should be portable so it can be used pretty much wherever
 * Make it stupid simple to use with zero setup
 
-###Get it on Nuget
+###When is it useful?
+In general, the publish/subscribe pattern is great when you want to communicate between pieces of your app without having those pieces being tightly dependent on each other.  You might find [this article on the subject](http://blog.mgechev.com/2013/04/24/why-to-use-publishsubscribe-in-javascript/) interesting (it talks specifically about javascript, but the concept applies)
 
-	Install-Package PubSub
+A few cases where I have found this library useful (namely in mobile development):
+* Persisting user settings to disk asynchronously
+* Posting a message (i.e. Twitter) and using Subscribe to refresh lists, update counts, etc.
+* Providing a nice, de-coupled communication medium between Activities and their child Fragments in a Xamarin.Android application.
 
-![nuget dialog image for PubSub PCL](http://i.imgur.com/jH6ONPg.png "Nuget dialog for PubSub PCL")
+There are lots of good applications for the publish/subscribe patterns.  Have a good one I didn't think of? [Let me know](https://github.com/upta/pubsub/issues)
+
 ###How to use it
 First, add a using.
 ```c#
@@ -64,6 +69,12 @@ To keep things simple, yet flexible, PubSub PCL is implemented using two core id
 	- This gives us nice strongly-typed data that can be passed from our Publish methods to our Subscribe handlers (i.e. Product above)
 * All interaction with the PubSub system is done through extention methods on System.Object (e.g. Publish, Subscribe and Unsubscribe)
 	- This allows for a zero-setup system, you can simply Subscribe on any object and Publish away
+
+###Get it on Nuget
+
+	Install-Package PubSub
+
+![nuget dialog image for PubSub PCL](http://i.imgur.com/jH6ONPg.png "Nuget dialog for PubSub PCL")
 
 ###Questions? Thoughts?
 Feel free to post stuff to the [issues](https://github.com/upta/pubsub/issues) page or hit me up on Twitter [@brianupta](https://twitter.com/brianupta)
