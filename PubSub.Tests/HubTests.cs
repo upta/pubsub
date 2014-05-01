@@ -7,6 +7,9 @@ namespace PubSub.Tests
     [TestClass]
     public class HubTests
     {
+        class Event { }
+        class SpecialEvent : Event { }
+
         [TestMethod]
         public void Cleanup_RemovesHandlersForDeadObjects()
         {
@@ -42,6 +45,41 @@ namespace PubSub.Tests
             // assert
             Assert.AreEqual( 2, callCount );
         }
+
+        [TestMethod]
+        public void Publish_SpecialEvent_CaughtByBase()
+        {
+            // arrange
+            var hub = new Hub();
+            var sender = new object();
+            int callCount = 0;
+            hub.Subscribe<SpecialEvent>(sender, new Action<SpecialEvent>(a => callCount++));
+            hub.Subscribe<Event>(sender, new Action<Event>(a => callCount++));
+
+            // act
+            hub.Publish<SpecialEvent>(sender, new SpecialEvent());
+
+            // assert
+            Assert.AreEqual(2, callCount);
+        }
+
+        [TestMethod]
+        public void Publish_BaseEvent_NotCaughtBySpecial()
+        {
+            // arrange
+            var hub = new Hub();
+            var sender = new object();
+            int callCount = 0;
+            hub.Subscribe<SpecialEvent>(sender, new Action<SpecialEvent>(a => callCount++));
+            hub.Subscribe<Event>(sender, new Action<Event>(a => callCount++));
+
+            // act
+            hub.Publish<Event>(sender, new Event());
+
+            // assert
+            Assert.AreEqual(1, callCount);
+        }
+
 
         [TestMethod]
         public void Publish_CleansUpBeforeSending()
