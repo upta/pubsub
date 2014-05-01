@@ -21,7 +21,7 @@ namespace PubSub
         {
             this.Cleanup();
 
-            foreach ( var l in this.handlers.Where( a => a.Type == typeof( T ) ).ToList() )
+            foreach (var l in this.handlers.Where(a => a.Type.IsAssignableFrom(typeof(T))).ToList())
             {
                 ( l.Action as Action<T> )( data );
             }
