@@ -21,7 +21,7 @@ namespace PubSub
         {
             this.Cleanup();
 
-            foreach (var l in this.handlers.Where(a => a.Type.IsAssignableFrom(typeof(T))).ToList())
+            foreach ( var l in this.handlers.Where( a => a.Type.IsAssignableFrom( typeof( T ) ) ).ToList() )
             {
                 ( l.Action as Action<T> )( data );
             }
@@ -35,6 +35,18 @@ namespace PubSub
                 Sender = new WeakReference( sender ),
                 Type = typeof( T )
             } );
+        }
+
+        public void Unsubscribe( object sender )
+        {
+            this.Cleanup();
+
+            var query = this.handlers.Where( a => a.Sender.Target.Equals( sender ) );
+
+            foreach ( var h in query.ToList() )
+            {
+                this.handlers.Remove( h );
+            }
         }
 
         public void Unsubscribe<T>( object sender, Action<T> handler = null )

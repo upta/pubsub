@@ -25,6 +25,11 @@ namespace PubSub
             hub.Subscribe( obj, handler );
         }
 
+        static public void Unsubscribe( this object obj )
+        {
+            hub.Unsubscribe( obj );
+        }
+
         static public void Unsubscribe<T>( this object obj )
         {
             hub.Unsubscribe( obj, (Action<T>) null );

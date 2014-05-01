@@ -123,7 +123,25 @@ namespace PubSub.Tests
 
 
         [TestMethod]
-        public void Unsubscribe_RemovesAllHandlersForSender()
+        public void Unsubscribe_RemovesAllHandlers_OfAnyType_ForSender()
+        {
+            // arrange
+            var hub = new Hub();
+            var sender = new object();
+            var preservedSender = new object();
+            hub.Subscribe( sender, new Action<string>( a => { } ) );
+            hub.Subscribe( sender, new Action<int>( a => { } ) );
+            hub.Subscribe( preservedSender, new Action<string>( a => { } ) );
+
+            // act
+            hub.Unsubscribe( sender );
+
+            // assert
+            Assert.IsFalse( hub.handlers.Any( a => a.Sender.Target == sender ) );
+        }
+
+        [TestMethod]
+        public void Unsubscribe_RemovesAllHandlers_OfSpecificType_ForSender()
         {
             // arrange
             var hub = new Hub();
@@ -141,7 +159,7 @@ namespace PubSub.Tests
         }
 
         [TestMethod]
-        public void Unsubscribe_RemovesSpecificHandlerForSender()
+        public void Unsubscribe_RemovesSpecificHandler_ForSender()
         {
             // arrange
             var hub = new Hub();
