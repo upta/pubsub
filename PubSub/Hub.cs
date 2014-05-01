@@ -5,7 +5,7 @@ using System.Text;
 
 namespace PubSub
 {
-    internal /*public*/ class Hub
+    internal class Hub
     {
         internal class Handler
         {
