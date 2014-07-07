@@ -80,6 +80,7 @@ To keep things simple, yet flexible, PubSub PCL is implemented using two core id
 * .Net Framwork 4.5 / 4.5.1
 * Windows 8 / 8.1
 * Windows Phone Silverlight 8 / 8.1
+* Windows Phone 8.1 (WinRT)
 * Silverlight 5
 * Xamarin.Android
 * Xamarin.iOS

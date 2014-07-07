@@ -14,55 +14,68 @@ namespace PubSub
             public Type Type { get; set; }
         }
 
+        internal object locker = new object();
         internal List<Handler> handlers = new List<Handler>();
 
 
         public void Publish<T>( object sender, T data = default(T) )
         {
-            this.Cleanup();
-
-            foreach ( var l in this.handlers.Where( a => a.Type.IsAssignableFrom( typeof( T ) ) ).ToList() )
+            lock ( this.locker )
             {
-                ( l.Action as Action<T> )( data );
+                this.Cleanup();
+
+                foreach ( var l in this.handlers.Where( a => a.Type.IsAssignableFrom( typeof( T ) ) ).ToList() )
+                {
+                    ( l.Action as Action<T> )( data );
+                }
             }
         }
 
         public void Subscribe<T>( object sender, Action<T> handler )
         {
-            this.handlers.Add( new Handler
+            lock ( this.locker )
             {
-                Action = handler,
-                Sender = new WeakReference( sender ),
-                Type = typeof( T )
-            } );
+                this.handlers.Add( new Handler
+                {
+                    Action = handler,
+                    Sender = new WeakReference( sender ),
+                    Type = typeof( T )
+                } );
+            }
         }
 
         public void Unsubscribe( object sender )
         {
-            this.Cleanup();
-
-            var query = this.handlers.Where( a => a.Sender.Target.Equals( sender ) );
-
-            foreach ( var h in query.ToList() )
+            lock ( this.locker )
             {
-                this.handlers.Remove( h );
+                this.Cleanup();
+
+                var query = this.handlers.Where( a => a.Sender.Target.Equals( sender ) );
+
+                foreach ( var h in query.ToList() )
+                {
+                    this.handlers.Remove( h );
+                }
             }
         }
 
         public void Unsubscribe<T>( object sender, Action<T> handler = null )
         {
-            this.Cleanup();
-
-            var query = this.handlers.Where( a => a.Sender.Target.Equals( sender ) && a.Type == typeof( T ) );
-
-            if ( handler != null )
+            lock ( this.locker )
             {
-                query = query.Where( a => a.Action.Equals( handler ) );
-            }
+                this.Cleanup();
 
-            foreach ( var h in query.ToList() )
-            {
-                this.handlers.Remove( h );
+                var query = this.handlers.Where( a => a.Sender.Target.Equals( sender ) && a.Type == typeof( T ) );
+
+                if ( handler != null )
+                {
+                    query = query.Where( a => a.Action.Equals( handler ) );
+                }
+
+                foreach ( var h in query.ToList() )
+                {
+                    this.handlers.Remove( h );
+                }
             }
         }
 
