@@ -10,6 +10,19 @@ namespace PubSub
     {
         static private readonly Hub hub = new Hub();
 
+        static public bool Exists<T>( this object obj )
+        {
+            foreach ( var h in hub.handlers )
+            {
+                if ( h.Sender.Target.ToString() == obj.ToString() &&
+                    typeof(T) == h.Type )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         static public void Publish<T>( this object obj )
         {
             hub.Publish( obj, default( T ) );
