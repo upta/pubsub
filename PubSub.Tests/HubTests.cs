@@ -9,27 +9,7 @@ namespace PubSub.Tests
     {
         class Event { }
         class SpecialEvent : Event { }
-
-        [TestMethod]
-        public void Cleanup_RemovesHandlersForDeadObjects()
-        {
-            // arrange
-            var hub = new Hub();
-            var condemnedSender = new object();
-
-            // act
-            hub.Subscribe( condemnedSender, new Action<string>( a => { } ) );
-
-            condemnedSender = null;
-            GC.Collect();
-
-            hub.Cleanup();
-
-            // assert
-            Assert.IsFalse( hub.handlers.Any() );
-        }
-
-
+        
         [TestMethod]
         public void Publish_CallsAllRegisteredActions()
         {
@@ -175,6 +155,30 @@ namespace PubSub.Tests
 
             // assert
             Assert.IsFalse( hub.handlers.Any( a => a.Action.Equals( actionToDie ) ) );
+        }
+
+
+        [TestMethod]
+        public void Unsubscribe_CleanUps()
+        {
+            // arrange
+            var hub = new Hub();
+            var sender = new object();
+            var condemnedSender = new object();
+            var actionToDie = new Action<string>(a => { });
+            hub.Subscribe(sender, actionToDie);
+            hub.Subscribe(sender, new Action<string>(a => { }));
+            hub.Subscribe(condemnedSender, new Action<string>(a => { }));
+
+            condemnedSender = null;
+
+            GC.Collect();
+
+            // act
+            hub.Unsubscribe<string>(sender);
+
+            // assert
+            Assert.AreEqual(0, hub.handlers.Count);
         }
     }
 }
