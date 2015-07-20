@@ -14,12 +14,13 @@ namespace PubSub
         {
             foreach ( var h in hub.handlers )
             {
-                if ( h.Sender.Target.ToString() == obj.ToString() &&
+                if ( Equals(h.Sender.Target, obj ) &&
                     typeof(T) == h.Type )
                 {
                     return true;
                 }
             }
+
             return false;
         }
 
