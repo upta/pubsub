@@ -18,33 +18,34 @@ namespace PubSub
         internal List<Handler> handlers = new List<Handler>();
 
 
-        public void Publish<T>( object sender, T data = default(T) )
+        public void Publish<T>( object sender, T data = default( T ) )
         {
-            List<Handler> handlerList = new List<Handler>(handlers.Count);
-            List<Handler> handlersToRemoveList = new List<Handler>(handlers.Count);
+            var handlerList = new List<Handler>( handlers.Count );
+            var handlersToRemoveList = new List<Handler>( handlers.Count );
 
             lock ( this.locker )
             {
-                foreach (var handler in handlers)
+                foreach ( var handler in handlers )
                 {
-                    if (!handler.Sender.IsAlive)
+                    if ( !handler.Sender.IsAlive )
                     {
-                        handlersToRemoveList.Add(handler);
+                        handlersToRemoveList.Add( handler );
                     }
-                    else if (handler.Type.IsAssignableFrom(typeof(T)))
+                    else if ( handler.Type.IsAssignableFrom( typeof( T ) ) )
                     {
-                        handlerList.Add(handler);
+                        handlerList.Add( handler );
                     }
                 }
-                foreach (var l in handlersToRemoveList)
+
+                foreach ( var l in handlersToRemoveList )
                 {
-                    handlers.Remove(l);
+                    handlers.Remove( l );
                 }
             }
 
-            foreach (var l in handlerList)
+            foreach ( var l in handlerList )
             {
-                ((Action<T>)l.Action)(data);
+                ( (Action<T>) l.Action )( data );
             }
         }
 
@@ -56,6 +57,7 @@ namespace PubSub
                 Sender = new WeakReference( sender ),
                 Type = typeof( T )
             };
+
             lock ( this.locker )
             {
                 this.handlers.Add( item );
@@ -66,9 +68,8 @@ namespace PubSub
         {
             lock ( this.locker )
             {
-                var query = this.handlers
-                    .Where( a => !a.Sender.IsAlive 
-                               || a.Sender.Target.Equals( sender ) );
+                var query = this.handlers .Where( a => !a.Sender.IsAlive ||
+                                                       a.Sender.Target.Equals( sender ) );
 
                 foreach ( var h in query.ToList() )
                 {
@@ -82,8 +83,8 @@ namespace PubSub
             lock ( this.locker )
             {
                 var query = this.handlers
-                    .Where(a => !a.Sender.IsAlive
-                             ||( a.Sender.Target.Equals(sender) && a.Type == typeof(T)));
+                    .Where( a => !a.Sender.IsAlive ||
+                                 ( a.Sender.Target.Equals( sender ) && a.Type == typeof( T ) ) );
 
                 if ( handler != null )
                 {

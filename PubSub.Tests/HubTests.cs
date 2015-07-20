@@ -9,7 +9,7 @@ namespace PubSub.Tests
     {
         class Event { }
         class SpecialEvent : Event { }
-        
+
         [TestMethod]
         public void Publish_CallsAllRegisteredActions()
         {
@@ -33,14 +33,14 @@ namespace PubSub.Tests
             var hub = new Hub();
             var sender = new object();
             int callCount = 0;
-            hub.Subscribe<SpecialEvent>(sender, new Action<SpecialEvent>(a => callCount++));
-            hub.Subscribe<Event>(sender, new Action<Event>(a => callCount++));
+            hub.Subscribe<SpecialEvent>( sender, new Action<SpecialEvent>( a => callCount++ ) );
+            hub.Subscribe<Event>( sender, new Action<Event>( a => callCount++ ) );
 
             // act
-            hub.Publish<SpecialEvent>(sender, new SpecialEvent());
+            hub.Publish<SpecialEvent>( sender, new SpecialEvent() );
 
             // assert
-            Assert.AreEqual(2, callCount);
+            Assert.AreEqual( 2, callCount );
         }
 
         [TestMethod]
@@ -50,14 +50,14 @@ namespace PubSub.Tests
             var hub = new Hub();
             var sender = new object();
             int callCount = 0;
-            hub.Subscribe<SpecialEvent>(sender, new Action<SpecialEvent>(a => callCount++));
-            hub.Subscribe<Event>(sender, new Action<Event>(a => callCount++));
+            hub.Subscribe<SpecialEvent>( sender, new Action<SpecialEvent>( a => callCount++ ) );
+            hub.Subscribe<Event>( sender, new Action<Event>( a => callCount++ ) );
 
             // act
-            hub.Publish<Event>(sender, new Event());
+            hub.Publish<Event>( sender, new Event() );
 
             // assert
-            Assert.AreEqual(1, callCount);
+            Assert.AreEqual( 1, callCount );
         }
 
 
@@ -165,20 +165,20 @@ namespace PubSub.Tests
             var hub = new Hub();
             var sender = new object();
             var condemnedSender = new object();
-            var actionToDie = new Action<string>(a => { });
-            hub.Subscribe(sender, actionToDie);
-            hub.Subscribe(sender, new Action<string>(a => { }));
-            hub.Subscribe(condemnedSender, new Action<string>(a => { }));
+            var actionToDie = new Action<string>( a => { } );
+            hub.Subscribe( sender, actionToDie );
+            hub.Subscribe( sender, new Action<string>( a => { } ) );
+            hub.Subscribe( condemnedSender, new Action<string>( a => { } ) );
 
             condemnedSender = null;
 
             GC.Collect();
 
             // act
-            hub.Unsubscribe<string>(sender);
+            hub.Unsubscribe<string>( sender );
 
             // assert
-            Assert.AreEqual(0, hub.handlers.Count);
+            Assert.AreEqual( 0, hub.handlers.Count );
         }
     }
 }
