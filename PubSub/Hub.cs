@@ -5,7 +5,7 @@ using System.Text;
 
 namespace PubSub
 {
-    internal class Hub
+    public class Hub
     {
         internal class Handler
         {
@@ -16,7 +16,6 @@ namespace PubSub
 
         internal object locker = new object();
         internal List<Handler> handlers = new List<Handler>();
-
 
         public void Publish<T>( object sender, T data = default( T ) )
         {

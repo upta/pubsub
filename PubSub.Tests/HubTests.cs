@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 
 namespace PubSub.Tests
 {
@@ -109,12 +110,9 @@ namespace PubSub.Tests
             var hub = new Hub();
             var sender = new object();
             var preservedSender = new object();
-            hub.Subscribe( sender, new Action<string>( a => { } ) );
-            hub.Subscribe( sender, new Action<int>( a => { } ) );
-            hub.Subscribe( preservedSender, new Action<string>( a => { } ) );
-
+            
             // act
-            hub.Unsubscribe( sender );
+            hub.Subscribe(sender, new Action<string>(a => { }));
 
             // assert
             Assert.IsFalse( hub.handlers.Any( a => a.Sender.Target == sender ) );
@@ -155,6 +153,18 @@ namespace PubSub.Tests
 
             // assert
             Assert.IsFalse( hub.handlers.Any( a => a.Action.Equals( actionToDie ) ) );
+        }
+
+        [TestMethod]
+        public void Exists_EventDoesExist()
+        {
+            // arrange
+            var hub = new Hub();
+            var sender = new object();
+            var action = new Action<string>(a => { });
+            hub.Subscribe<string>(sender, action);
+
+            Assert.IsTrue(action.Exists<string>());
         }
 
 
