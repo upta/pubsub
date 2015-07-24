@@ -10,7 +10,7 @@ namespace PubSub.Tests
     {
         class Event { }
         class SpecialEvent : Event { }
-
+        
         [TestMethod]
         public void Publish_CallsAllRegisteredActions()
         {
@@ -153,6 +153,38 @@ namespace PubSub.Tests
 
             // assert
             Assert.IsFalse( hub.handlers.Any( a => a.Action.Equals( actionToDie ) ) );
+        }
+
+         [TestMethod]
+        public void Exists_Static()
+        {
+            // arrange
+            var action = new Action<string>(a => { });
+            this.Subscribe(action);
+
+            // act
+            var exists = this.Exists<string>();
+
+            // assert
+            Assert.IsTrue(exists);
+
+            this.Unsubscribe(action);
+        }
+
+        [TestMethod]
+        public void NotExists_Static()
+        {
+            // arrange
+            var action = new Action<bool>(a => { });
+            this.Subscribe(action);
+
+            // act
+            var exists = this.Exists<string>();
+
+            // assert
+            Assert.IsFalse(exists);
+            
+            this.Unsubscribe(action);
         }
 
         [TestMethod]
