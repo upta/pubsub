@@ -112,9 +112,12 @@ namespace PubSub.Tests
             var preservedSender = new object();
             
             // act
+            hub.Subscribe(preservedSender, new Action<string>(a => { }));
             hub.Subscribe(sender, new Action<string>(a => { }));
+            hub.Unsubscribe(sender);
 
             // assert
+            Assert.IsTrue(hub.handlers.Any( a => a.Sender.Target == preservedSender ));
             Assert.IsFalse( hub.handlers.Any( a => a.Sender.Target == sender ) );
         }
 
@@ -194,9 +197,12 @@ namespace PubSub.Tests
             var hub = new Hub();
             var sender = new object();
             var action = new Action<string>(a => { });
-            hub.Subscribe<string>(sender, action);
 
-            Assert.IsTrue(action.Exists<string>());
+            // act
+            hub.Subscribe(sender, action);
+            
+            // assert
+            Assert.IsTrue( hub.handlers.Any( a => a.Action.Equals( action ) ) );
         }
 
 
