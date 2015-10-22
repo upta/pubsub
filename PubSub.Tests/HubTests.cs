@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 
 namespace PubSub.Tests
 {
@@ -9,7 +10,7 @@ namespace PubSub.Tests
     {
         class Event { }
         class SpecialEvent : Event { }
-
+        
         [TestMethod]
         public void Publish_CallsAllRegisteredActions()
         {
@@ -109,14 +110,14 @@ namespace PubSub.Tests
             var hub = new Hub();
             var sender = new object();
             var preservedSender = new object();
-            hub.Subscribe( sender, new Action<string>( a => { } ) );
-            hub.Subscribe( sender, new Action<int>( a => { } ) );
-            hub.Subscribe( preservedSender, new Action<string>( a => { } ) );
-
+            
             // act
-            hub.Unsubscribe( sender );
+            hub.Subscribe(preservedSender, new Action<string>(a => { }));
+            hub.Subscribe(sender, new Action<string>(a => { }));
+            hub.Unsubscribe(sender);
 
             // assert
+            Assert.IsTrue(hub.handlers.Any( a => a.Sender.Target == preservedSender ));
             Assert.IsFalse( hub.handlers.Any( a => a.Sender.Target == sender ) );
         }
 
@@ -155,6 +156,53 @@ namespace PubSub.Tests
 
             // assert
             Assert.IsFalse( hub.handlers.Any( a => a.Action.Equals( actionToDie ) ) );
+        }
+
+         [TestMethod]
+        public void Exists_Static()
+        {
+            // arrange
+            var action = new Action<string>(a => { });
+            this.Subscribe(action);
+
+            // act
+            var exists = this.Exists<string>();
+
+            // assert
+            Assert.IsTrue(exists);
+
+            this.Unsubscribe(action);
+        }
+
+        [TestMethod]
+        public void NotExists_Static()
+        {
+            // arrange
+            var action = new Action<bool>(a => { });
+            this.Subscribe(action);
+
+            // act
+            var exists = this.Exists<string>();
+
+            // assert
+            Assert.IsFalse(exists);
+            
+            this.Unsubscribe(action);
+        }
+
+        [TestMethod]
+        public void Exists_EventDoesExist()
+        {
+            // arrange
+            var hub = new Hub();
+            var sender = new object();
+            var action = new Action<string>(a => { });
+
+            // act
+            hub.Subscribe(sender, action);
+            
+            // assert
+            Assert.IsTrue( hub.handlers.Any( a => a.Action.Equals( action ) ) );
         }
 
 
