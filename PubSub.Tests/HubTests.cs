@@ -228,5 +228,45 @@ namespace PubSub.Tests
             // assert
             Assert.AreEqual( 0, hub.handlers.Count );
         }
+
+        [TestMethod]
+        public void PublishExtensions()
+        {
+            // arrange
+            int callCount = 0;
+
+            this.Subscribe<Event>(new Action<Event>(a => callCount++));
+            this.Subscribe(new Action<Event>(a => callCount++));
+
+            // act
+            this.Publish(new Event());
+            this.Publish<SpecialEvent>(new SpecialEvent());
+
+            // assert
+            Assert.AreEqual(4, callCount);
+        }
+
+        [TestMethod]
+        public void PublishDirectlyToHub()
+        {
+            // arrange
+            int callCount = 0;
+            var myhub = new Hub();
+
+            // before change, this lies and subscribes to the static hub instead.
+            myhub.Subscribe<Event>(new Action<Event>(a => callCount++));
+            myhub.Subscribe(new Action<Event>(a => callCount++));
+
+            // act
+            
+            // before change, this uses the static hub in the Extensions.
+            myhub.Publish(new Event());
+            // before change, this uses myhub which has no listeners.
+            myhub.Publish<SpecialEvent>(new SpecialEvent());
+
+            // assert
+            Assert.AreEqual(4, callCount);
+
+        }
     }
 }

@@ -17,6 +17,16 @@ namespace PubSub
         internal object locker = new object();
         internal List<Handler> handlers = new List<Handler>();
 
+        /// <summary>
+        /// Allow publishing directly onto this Hub.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        public void Publish<T>(T data = default(T))
+        {
+            Publish(this, data);
+        }
+
         public void Publish<T>( object sender, T data = default( T ) )
         {
             var handlerList = new List<Handler>( handlers.Count );
@@ -46,6 +56,16 @@ namespace PubSub
             {
                 ( (Action<T>) l.Action )( data );
             }
+        }
+
+        /// <summary>
+        /// Allow subscribing directly to this Hub.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="handler"></param>
+        public void Subscribe<T>(Action<T> handler)
+        {
+            Subscribe(this, handler);
         }
 
         public void Subscribe<T>( object sender, Action<T> handler )
