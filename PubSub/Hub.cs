@@ -83,6 +83,14 @@ namespace PubSub
             }
         }
 
+        /// <summary>
+        /// Allow unsubscribing directly to this Hub.
+        /// </summary>
+        public void Unsubscribe()
+        {
+            Unsubscribe(this);
+        }
+
         public void Unsubscribe( object sender )
         {
             lock ( this.locker )
@@ -95,6 +103,25 @@ namespace PubSub
                     this.handlers.Remove( h );
                 }
             }
+        }
+
+        /// <summary>
+        /// Allow unsubscribing directly to this Hub.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public void Unsubscribe<T>()
+        {
+            Unsubscribe<T>(this);
+        }
+
+        /// <summary>
+        /// Allow unsubscribing directly to this Hub.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="handler"></param>
+        public void Unsubscribe<T>(Action<T> handler = null)
+        {
+            Unsubscribe<T>(this, handler);
         }
 
         public void Unsubscribe<T>( object sender, Action<T> handler = null )

@@ -241,21 +241,24 @@ namespace PubSub.Tests
             // act
             this.Publish(new Event());
             this.Publish<SpecialEvent>(new SpecialEvent());
+            this.Publish<Event>();
 
             // assert
-            Assert.AreEqual(4, callCount);
+            Assert.AreEqual(6, callCount);
         }
 
         [TestMethod]
-        public void PublishDirectlyToHub()
+        public void PubSubUnsubDirectlyToHub()
         {
             // arrange
             int callCount = 0;
+            var action = new Action<Event>(a => callCount++);
             var myhub = new Hub();
 
             // before change, this lies and subscribes to the static hub instead.
             myhub.Subscribe<Event>(new Action<Event>(a => callCount++));
-            myhub.Subscribe(new Action<Event>(a => callCount++));
+            myhub.Subscribe(new Action<SpecialEvent>(a => callCount++));
+            myhub.Subscribe(action);
 
             // act
             
@@ -263,10 +266,86 @@ namespace PubSub.Tests
             myhub.Publish(new Event());
             // before change, this uses myhub which has no listeners.
             myhub.Publish<SpecialEvent>(new SpecialEvent());
+            // before change, this uses the static hub in the Extensions.
+            myhub.Publish<Event>();
 
             // assert
-            Assert.AreEqual(4, callCount);
+            Assert.AreEqual(7, callCount);
 
+            // unsubscribe
+            // before change, this lies and unsubscribes from the static hub instead.
+            myhub.Unsubscribe<SpecialEvent>();
+
+            // act
+            myhub.Publish(new SpecialEvent());
+            
+            // assert
+            Assert.AreEqual(9, callCount);
+
+            // unsubscribe specific action
+            myhub.Unsubscribe(action);
+
+            // act
+            myhub.Publish(new SpecialEvent());
+
+            // assert
+            Assert.AreEqual(10, callCount);
+
+            // unsubscribe to all
+            myhub.Unsubscribe();
+
+            // act
+            myhub.Publish(new SpecialEvent());
+
+            // assert
+            Assert.AreEqual(10, callCount);
+        }
+
+        [TestMethod]
+        public void UnsubscribeExtensions()
+        {
+            // arrange
+            int callCount = 0;
+            var action = new Action<Event>(a => callCount++);
+
+            this.Subscribe<Event>(new Action<Event>(a => callCount++));
+            this.Subscribe(new Action<SpecialEvent>(a => callCount++));
+            this.Subscribe(action);
+
+            // act
+            this.Publish(new Event());
+            this.Publish<SpecialEvent>(new SpecialEvent());
+            this.Publish<Event>();
+
+            // assert
+            Assert.AreEqual(7, callCount);
+
+            // unsubscribe
+            this.Unsubscribe<SpecialEvent>();
+
+            // act
+            this.Publish<SpecialEvent>();
+
+            // assert
+            Assert.AreEqual(9, callCount);
+
+            // unsubscribe specific action
+            this.Unsubscribe(action);
+
+            // act
+            this.Publish<SpecialEvent>();
+
+            // assert
+            Assert.AreEqual(10, callCount);
+
+            // unsubscribe from all
+            this.Unsubscribe();
+
+            // act
+            this.Publish<SpecialEvent>();
+
+            // assert
+            Assert.AreEqual(10, callCount);
         }
     }
 }
