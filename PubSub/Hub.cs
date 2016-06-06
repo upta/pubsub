@@ -17,6 +17,16 @@ namespace PubSub
         internal object locker = new object();
         internal List<Handler> handlers = new List<Handler>();
 
+        /// <summary>
+        /// Allow publishing directly onto this Hub.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        public void Publish<T>(T data = default(T))
+        {
+            Publish(this, data);
+        }
+
         public void Publish<T>( object sender, T data = default( T ) )
         {
             var handlerList = new List<Handler>( handlers.Count );
@@ -48,6 +58,16 @@ namespace PubSub
             }
         }
 
+        /// <summary>
+        /// Allow subscribing directly to this Hub.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="handler"></param>
+        public void Subscribe<T>(Action<T> handler)
+        {
+            Subscribe(this, handler);
+        }
+
         public void Subscribe<T>( object sender, Action<T> handler )
         {
             var item = new Handler
@@ -63,6 +83,14 @@ namespace PubSub
             }
         }
 
+        /// <summary>
+        /// Allow unsubscribing directly to this Hub.
+        /// </summary>
+        public void Unsubscribe()
+        {
+            Unsubscribe(this);
+        }
+
         public void Unsubscribe( object sender )
         {
             lock ( this.locker )
@@ -75,6 +103,25 @@ namespace PubSub
                     this.handlers.Remove( h );
                 }
             }
+        }
+
+        /// <summary>
+        /// Allow unsubscribing directly to this Hub.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public void Unsubscribe<T>()
+        {
+            Unsubscribe<T>(this);
+        }
+
+        /// <summary>
+        /// Allow unsubscribing directly to this Hub.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="handler"></param>
+        public void Unsubscribe<T>(Action<T> handler = null)
+        {
+            Unsubscribe<T>(this, handler);
         }
 
         public void Unsubscribe<T>( object sender, Action<T> handler = null )
