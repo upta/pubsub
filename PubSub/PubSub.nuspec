@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <package>
-  <metadata>
-    <id>PubSub</id>
-    <version>1.5.0</version>
-    <title>PubSub PCL</title>
-    <authors>upta</authors>
-    <owners>upta</owners>
-    <projectUrl>http://github.com/upta/pubsub</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <tags>PCL portable pubsub eventaggregator c#</tags>
-    <description>
+	<metadata>
+		<id>PubSub</id>
+		<version>1.5.1</version>
+		<title>PubSub PCL</title>
+		<authors>upta</authors>
+		<owners>upta</owners>
+		<projectUrl>http://github.com/upta/pubsub</projectUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<tags>PCL portable pubsub eventaggregator c#</tags>
+		<description>
       An extremely light-weight, easy to use PCL pub/sub library
     </description>
-  </metadata>
-  <files>
-    <file src="bin\Release\PubSub.dll" target="lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1" />
-  </files>
+	</metadata>
+	<files>
+		<file src="bin\Release\PubSub.dll" target="lib/netstandard1.5" />
+	</files>
 </package>

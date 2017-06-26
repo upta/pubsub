@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 
 namespace PubSub
 {
@@ -27,34 +27,34 @@ namespace PubSub
             Publish(this, data);
         }
 
-        public void Publish<T>( object sender, T data = default( T ) )
+        public void Publish<T>(object sender, T data = default(T))
         {
-            var handlerList = new List<Handler>( handlers.Count );
-            var handlersToRemoveList = new List<Handler>( handlers.Count );
+            var handlerList = new List<Handler>(handlers.Count);
+            var handlersToRemoveList = new List<Handler>(handlers.Count);
 
-            lock ( this.locker )
+            lock (this.locker)
             {
-                foreach ( var handler in handlers )
+                foreach (var handler in handlers)
                 {
-                    if ( !handler.Sender.IsAlive )
+                    if (!handler.Sender.IsAlive)
                     {
-                        handlersToRemoveList.Add( handler );
+                        handlersToRemoveList.Add(handler);
                     }
-                    else if ( handler.Type.IsAssignableFrom( typeof( T ) ) )
+                    else if (handler.Type.GetTypeInfo().IsAssignableFrom(typeof(T)))
                     {
-                        handlerList.Add( handler );
+                        handlerList.Add(handler);
                     }
                 }
 
-                foreach ( var l in handlersToRemoveList )
+                foreach (var l in handlersToRemoveList)
                 {
-                    handlers.Remove( l );
+                    handlers.Remove(l);
                 }
             }
 
-            foreach ( var l in handlerList )
+            foreach (var l in handlerList)
             {
-                ( (Action<T>) l.Action )( data );
+                ((Action<T>)l.Action)(data);
             }
         }
 
@@ -68,18 +68,18 @@ namespace PubSub
             Subscribe(this, handler);
         }
 
-        public void Subscribe<T>( object sender, Action<T> handler )
+        public void Subscribe<T>(object sender, Action<T> handler)
         {
             var item = new Handler
             {
                 Action = handler,
-                Sender = new WeakReference( sender ),
-                Type = typeof( T )
+                Sender = new WeakReference(sender),
+                Type = typeof(T)
             };
 
-            lock ( this.locker )
+            lock (this.locker)
             {
-                this.handlers.Add( item );
+                this.handlers.Add(item);
             }
         }
 
@@ -91,16 +91,16 @@ namespace PubSub
             Unsubscribe(this);
         }
 
-        public void Unsubscribe( object sender )
+        public void Unsubscribe(object sender)
         {
-            lock ( this.locker )
+            lock (this.locker)
             {
-                var query = this.handlers .Where( a => !a.Sender.IsAlive ||
-                                                       a.Sender.Target.Equals( sender ) );
+                var query = this.handlers.Where(a => !a.Sender.IsAlive ||
+                                                     a.Sender.Target.Equals(sender));
 
-                foreach ( var h in query.ToList() )
+                foreach (var h in query.ToList())
                 {
-                    this.handlers.Remove( h );
+                    this.handlers.Remove(h);
                 }
             }
         }
@@ -124,22 +124,22 @@ namespace PubSub
             Unsubscribe<T>(this, handler);
         }
 
-        public void Unsubscribe<T>( object sender, Action<T> handler = null )
+        public void Unsubscribe<T>(object sender, Action<T> handler = null)
         {
-            lock ( this.locker )
+            lock (this.locker)
             {
                 var query = this.handlers
-                    .Where( a => !a.Sender.IsAlive ||
-                                 ( a.Sender.Target.Equals( sender ) && a.Type == typeof( T ) ) );
+                    .Where(a => !a.Sender.IsAlive ||
+                                (a.Sender.Target.Equals(sender) && a.Type == typeof(T)));
 
-                if ( handler != null )
+                if (handler != null)
                 {
-                    query = query.Where( a => a.Action.Equals( handler ) );
+                    query = query.Where(a => a.Action.Equals(handler));
                 }
 
-                foreach ( var h in query.ToList() )
+                foreach (var h in query.ToList())
                 {
-                    this.handlers.Remove( h );
+                    this.handlers.Remove(h);
                 }
             }
         }
