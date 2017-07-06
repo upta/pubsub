@@ -10,6 +10,15 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>12.0</OldToolsVersion>
+    <!--Start of Nuspec metadata-->
+    <PackageId>PubSub</PackageId>
+    <Title>PubSub dotnet</Title>
+    <Authors>upta</Authors>   
+    <PackageProjectUrl>http://github.com/upta/pubsub</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageTags>PCL;portable;pubsub;eventaggregator;c#</PackageTags>
+    <Description>An extremely light-weight, easy to use PCL pub/sub library</Description>
+    <!--End of Nuspec metadata-->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,9 +42,6 @@
     <Compile Remove="obj\**" />
     <EmbeddedResource Remove="obj\**" />
     <None Remove="obj\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PubSub.nuspec" />
   </ItemGroup>
   
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
