@@ -40,7 +40,7 @@ namespace PubSub
                     {
                         handlersToRemoveList.Add(handler);
                     }
-                    else if (handler.Type.GetTypeInfo().IsAssignableFrom(typeof(T)))
+                    else if (handler.Type.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()))
                     {
                         handlerList.Add(handler);
                     }
