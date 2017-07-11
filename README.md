@@ -1,4 +1,4 @@
-# PubSub PCL [![Build status](https://ci.appveyor.com/api/projects/status/q228h98xg9905ghc)](https://ci.appveyor.com/project/upta/pubsub)
+# PubSub .Net [![Build status](https://ci.appveyor.com/api/projects/status/q228h98xg9905ghc)](https://ci.appveyor.com/project/upta/pubsub)
 
 An extremely light-weight, easy to use PCL pub/sub library 
 
