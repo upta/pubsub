@@ -1,6 +1,6 @@
 # PubSub .Net [![Build status](https://ci.appveyor.com/api/projects/status/q228h98xg9905ghc)](https://ci.appveyor.com/project/upta/pubsub)
 
-An extremely light-weight, easy to use PCL pub/sub library 
+An extremely light-weight, easy to use .Net pub/sub library 
 
 ### The idea
 * Provide the ability to do de-coupled communitcation without having to include some large (and often opinionated) framework when all you want is pubsub
