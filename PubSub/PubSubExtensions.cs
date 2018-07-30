@@ -6,16 +6,6 @@ namespace PubSub
     {
         private static readonly Hub hub = new Hub();
 
-        public static bool Exists<T>(this object obj)
-        {
-            foreach (var h in hub.handlers)
-                if (Equals(h.Sender.Target, obj) &&
-                    typeof(T) == h.Type)
-                    return true;
-
-            return false;
-        }
-
         public static void Publish<T>(this object obj)
         {
             hub.Publish(obj, default(T));
@@ -44,6 +34,11 @@ namespace PubSub
         public static void Unsubscribe<T>(this object obj, Action<T> handler)
         {
             hub.Unsubscribe(obj, handler);
+        }
+
+        public static bool Exists<T>(this object obj)
+        {
+            return hub.Exists<T>(obj);
         }
     }
 }

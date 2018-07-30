@@ -118,6 +118,16 @@ namespace PubSub
             }
         }
 
+        public bool Exists<T>(object subscriber)
+        {
+            foreach (var h in handlers)
+                if (Equals(h.Sender.Target, subscriber) &&
+                    typeof(T) == h.Type)
+                    return true;
+
+            return false;
+        }
+
         internal class Handler
         {
             public Delegate Action { get; set; }
