@@ -51,12 +51,12 @@ namespace PubSub
             Subscribe(this, handler);
         }
 
-        public void Subscribe<T>(object sender, Action<T> handler)
+        public void Subscribe<T>(object subscriber, Action<T> handler)
         {
             var item = new Handler
             {
                 Action = handler,
-                Sender = new WeakReference(sender),
+                Sender = new WeakReference(subscriber),
                 Type = typeof(T)
             };
 
@@ -74,12 +74,12 @@ namespace PubSub
             Unsubscribe(this);
         }
 
-        public void Unsubscribe(object sender)
+        public void Unsubscribe(object subscriber)
         {
             lock (locker)
             {
                 var query = handlers.Where(a => !a.Sender.IsAlive ||
-                                                a.Sender.Target.Equals(sender));
+                                                a.Sender.Target.Equals(subscriber));
 
                 foreach (var h in query.ToList()) handlers.Remove(h);
             }
@@ -104,13 +104,13 @@ namespace PubSub
             Unsubscribe(this, handler);
         }
 
-        public void Unsubscribe<T>(object sender, Action<T> handler = null)
+        public void Unsubscribe<T>(object subscriber, Action<T> handler = null)
         {
             lock (locker)
             {
                 var query = handlers
                     .Where(a => !a.Sender.IsAlive ||
-                                a.Sender.Target.Equals(sender) && a.Type == typeof(T));
+                                a.Sender.Target.Equals(subscriber) && a.Type == typeof(T));
 
                 if (handler != null) query = query.Where(a => a.Action.Equals(handler));
 
