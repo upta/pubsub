@@ -99,7 +99,7 @@ namespace PubSub
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler"></param>
-        public void Unsubscribe<T>(Action<T> handler = null)
+        public void Unsubscribe<T>(Action<T> handler)
         {
             Unsubscribe(this, handler);
         }
