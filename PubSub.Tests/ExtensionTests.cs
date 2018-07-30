@@ -56,5 +56,52 @@ namespace PubSub.Tests
             // assert
             Assert.AreEqual(6, callCount);
         }
+
+        [TestMethod]
+        public void UnsubscribeExtensions()
+        {
+            // arrange
+            var callCount = 0;
+            var action = new Action<Event>(a => callCount++);
+
+            this.Subscribe(new Action<Event>(a => callCount++));
+            this.Subscribe(new Action<SpecialEvent>(a => callCount++));
+            this.Subscribe(action);
+
+            // act
+            this.Publish(new Event());
+            this.Publish(new SpecialEvent());
+            this.Publish<Event>();
+
+            // assert
+            Assert.AreEqual(7, callCount);
+
+            // unsubscribe
+            this.Unsubscribe<SpecialEvent>();
+
+            // act
+            this.Publish<SpecialEvent>();
+
+            // assert
+            Assert.AreEqual(9, callCount);
+
+            // unsubscribe specific action
+            this.Unsubscribe(action);
+
+            // act
+            this.Publish<SpecialEvent>();
+
+            // assert
+            Assert.AreEqual(10, callCount);
+
+            // unsubscribe from all
+            this.Unsubscribe();
+
+            // act
+            this.Publish<SpecialEvent>();
+
+            // assert
+            Assert.AreEqual(10, callCount);
+        }
     }
 }

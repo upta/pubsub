@@ -2,18 +2,31 @@
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PubSub.Core;
-using PubSub.Extension;
 
 namespace PubSub.Tests
 {
     [TestClass]
     public class CoreHubTests
     {
+        private Hub hub;
+        private object sender;
+        private object condemnedSender;
+        private object preservedSender;
+
+
+        [TestInitialize]
+        public void Setup()
+        {
+            hub = new Hub();
+            sender = new object();
+            condemnedSender = new object();
+            preservedSender = new object();
+        }
+        
         [TestMethod]
         public void Publish_CallsAllRegisteredActions()
         {
             // arrange
-            var hub = new Hub();
             var callCount = 0;
             hub.Subscribe(new object(), new Action<string>(a => callCount++));
             hub.Subscribe(new object(), new Action<string>(a => callCount++));
@@ -29,8 +42,6 @@ namespace PubSub.Tests
         public void Publish_SpecialEvent_CaughtByBase()
         {
             // arrange
-            var hub = new Hub();
-            var sender = new object();
             var callCount = 0;
             hub.Subscribe<Event>(sender, a => callCount++);
             hub.Subscribe(sender, new Action<Event>(a => callCount++));
@@ -46,8 +57,6 @@ namespace PubSub.Tests
         public void Publish_BaseEvent_NotCaughtBySpecial()
         {
             // arrange
-            var hub = new Hub();
-            var sender = new object();
             var callCount = 0;
             hub.Subscribe(sender, new Action<SpecialEvent>(a => callCount++));
             hub.Subscribe(sender, new Action<Event>(a => callCount++));
@@ -64,8 +73,6 @@ namespace PubSub.Tests
         public void Publish_CleansUpBeforeSending()
         {
             // arrange
-            var hub = new Hub();
-            var condemnedSender = new object();
             var liveSender = new object();
 
             // act
@@ -86,8 +93,6 @@ namespace PubSub.Tests
         public void Subscribe_AddsHandlerToList()
         {
             // arrange
-            var hub = new Hub();
-            var sender = new object();
             var action = new Action<string>(a => { });
 
             // act
@@ -104,11 +109,6 @@ namespace PubSub.Tests
         [TestMethod]
         public void Unsubscribe_RemovesAllHandlers_OfAnyType_ForSender()
         {
-            // arrange
-            var hub = new Hub();
-            var sender = new object();
-            var preservedSender = new object();
-
             // act
             hub.Subscribe(preservedSender, new Action<string>(a => { }));
             hub.Subscribe(sender, new Action<string>(a => { }));
@@ -123,9 +123,6 @@ namespace PubSub.Tests
         public void Unsubscribe_RemovesAllHandlers_OfSpecificType_ForSender()
         {
             // arrange
-            var hub = new Hub();
-            var sender = new object();
-            var preservedSender = new object();
             hub.Subscribe(sender, new Action<string>(a => { }));
             hub.Subscribe(sender, new Action<string>(a => { }));
             hub.Subscribe(preservedSender, new Action<string>(a => { }));
@@ -140,10 +137,6 @@ namespace PubSub.Tests
         [TestMethod]
         public void Unsubscribe_RemovesSpecificHandler_ForSender()
         {
-            // arrange
-            var hub = new Hub();
-            var sender = new object();
-            var preservedSender = new object();
             var actionToDie = new Action<string>(a => { });
             hub.Subscribe(sender, actionToDie);
             hub.Subscribe(sender, new Action<string>(a => { }));
@@ -161,8 +154,6 @@ namespace PubSub.Tests
         [TestMethod]
         public void Exists_EventDoesExist()
         {
-            var hub = new Hub();
-            var sender = new object();
             var action = new Action<string>(a => { });
 
             hub.Subscribe(sender, action);
@@ -175,9 +166,6 @@ namespace PubSub.Tests
         public void Unsubscribe_CleanUps()
         {
             // arrange
-            var hub = new Hub();
-            var sender = new object();
-            var condemnedSender = new object();
             var actionToDie = new Action<string>(a => { });
             hub.Subscribe(sender, actionToDie);
             hub.Subscribe(sender, new Action<string>(a => { }));
@@ -245,53 +233,6 @@ namespace PubSub.Tests
 
             // act
             myhub.Publish(new SpecialEvent());
-
-            // assert
-            Assert.AreEqual(10, callCount);
-        }
-
-        [TestMethod]
-        public void UnsubscribeExtensions()
-        {
-            // arrange
-            var callCount = 0;
-            var action = new Action<Event>(a => callCount++);
-
-            this.Subscribe(new Action<Event>(a => callCount++));
-            this.Subscribe(new Action<SpecialEvent>(a => callCount++));
-            this.Subscribe(action);
-
-            // act
-            this.Publish(new Event());
-            this.Publish(new SpecialEvent());
-            this.Publish<Event>();
-
-            // assert
-            Assert.AreEqual(7, callCount);
-
-            // unsubscribe
-            this.Unsubscribe<SpecialEvent>();
-
-            // act
-            this.Publish<SpecialEvent>();
-
-            // assert
-            Assert.AreEqual(9, callCount);
-
-            // unsubscribe specific action
-            this.Unsubscribe(action);
-
-            // act
-            this.Publish<SpecialEvent>();
-
-            // assert
-            Assert.AreEqual(10, callCount);
-
-            // unsubscribe from all
-            this.Unsubscribe();
-
-            // act
-            this.Publish<SpecialEvent>();
 
             // assert
             Assert.AreEqual(10, callCount);
