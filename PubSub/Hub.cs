@@ -23,11 +23,12 @@ namespace PubSub
 
         public void Publish<T>(object sender, T data = default(T))
         {
-            var handlerList = new List<Handler>(handlers.Count);
-            var handlersToRemoveList = new List<Handler>(handlers.Count);
+            List<Handler> handlerList;
 
             lock (locker)
             {
+                handlerList = new List<Handler>(handlers.Count);
+                var handlersToRemoveList = new List<Handler>(handlers.Count);
                 foreach (var handler in handlers)
                     if (!handler.Sender.IsAlive)
                         handlersToRemoveList.Add(handler);
