@@ -7,7 +7,7 @@ using PubSub.Extension;
 namespace PubSub.Tests
 {
     [TestClass]
-    public class HubTests
+    public class CoreHubTests
     {
         [TestMethod]
         public void Publish_CallsAllRegisteredActions()
@@ -156,51 +156,18 @@ namespace PubSub.Tests
             Assert.IsFalse(hub.handlers.Any(a => a.Action.Equals(actionToDie)));
         }
 
-        [TestMethod]
-        public void Exists_Static()
-        {
-            // arrange
-            var action = new Action<string>(a => { });
-            this.Subscribe(action);
-
-            // act
-            var exists = this.Exists<string>();
-
-            // assert
-            Assert.IsTrue(exists);
-
-            this.Unsubscribe(action);
-        }
-
-        [TestMethod]
-        public void NotExists_Static()
-        {
-            // arrange
-            var action = new Action<bool>(a => { });
-            this.Subscribe(action);
-
-            // act
-            var exists = this.Exists<string>();
-
-            // assert
-            Assert.IsFalse(exists);
-
-            this.Unsubscribe(action);
-        }
+       
 
         [TestMethod]
         public void Exists_EventDoesExist()
         {
-            // arrange
             var hub = new Hub();
             var sender = new object();
             var action = new Action<string>(a => { });
 
-            // act
             hub.Subscribe(sender, action);
 
-            // assert
-            Assert.IsTrue(hub.handlers.Any(a => a.Action.Equals(action)));
+            Assert.IsTrue(hub.Exists(sender, action));
         }
 
 
@@ -227,23 +194,7 @@ namespace PubSub.Tests
             Assert.AreEqual(0, hub.handlers.Count);
         }
 
-        [TestMethod]
-        public void PublishExtensions()
-        {
-            // arrange
-            var callCount = 0;
-
-            this.Subscribe(new Action<Event>(a => callCount++));
-            this.Subscribe(new Action<Event>(a => callCount++));
-
-            // act
-            this.Publish(new Event());
-            this.Publish(new SpecialEvent());
-            this.Publish<Event>();
-
-            // assert
-            Assert.AreEqual(6, callCount);
-        }
+        
 
         [TestMethod]
         public void PubSubUnsubDirectlyToHub()
@@ -345,13 +296,13 @@ namespace PubSub.Tests
             // assert
             Assert.AreEqual(10, callCount);
         }
+    }
 
-        private class Event
-        {
-        }
+    public class Event
+    {
+    }
 
-        private class SpecialEvent : Event
-        {
-        }
+    public class SpecialEvent : Event
+    {
     }
 }

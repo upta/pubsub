@@ -4,15 +4,15 @@ namespace PubSub
 {
     public class Publisher : IPublisher
     {
-        private readonly Hub _hub;
+        private readonly Hub hub;
         public Publisher(Hub hub)
         {
-            _hub = hub;
+            this.hub = hub;
         }
 
         public void Publish<T>(object sender,T data )
         {
-            _hub.Publish(sender, data);
+            hub.Publish(sender, data);
         }
     }
 }

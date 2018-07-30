@@ -9,5 +9,6 @@ namespace PubSub
         void Unsubscribe<T>(object subscriber );
         void Unsubscribe<T>(object subscriber, Action<T> handler );
         bool Exists<T>(object subscriber);
+        bool Exists<T>(object subscriber, Action<T> handler);
     }
 }

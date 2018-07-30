@@ -4,22 +4,22 @@ namespace PubSub
 {
     public class PubSubPipelineFactory : IPubSubPipelineFactory
     {
-        private readonly Hub _hub;
+        private readonly Hub hub;
 
         public PubSubPipelineFactory()
         {
-            _hub = new Hub();
+            hub = new Hub();
         }
 
         
         public IPublisher GetPublisher()
         {
-            return new Publisher(_hub);
+            return new Publisher(hub);
         }
 
         public ISubscriber GetSubscriber()
         {
-            return new Subscriber(_hub);
+            return new Subscriber(hub);
         }
     }
 }
