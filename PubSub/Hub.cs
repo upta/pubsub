@@ -7,18 +7,12 @@ namespace PubSub
 {
     public class Hub
     {
-        internal class Handler
-        {
-            public Delegate Action { get; set; }
-            public WeakReference Sender { get; set; }
-            public Type Type { get; set; }
-        }
-
-        internal object locker = new object();
         internal List<Handler> handlers = new List<Handler>();
 
+        internal object locker = new object();
+
         /// <summary>
-        /// Allow publishing directly onto this Hub.
+        ///     Allow publishing directly onto this Hub.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
@@ -32,34 +26,22 @@ namespace PubSub
             var handlerList = new List<Handler>(handlers.Count);
             var handlersToRemoveList = new List<Handler>(handlers.Count);
 
-            lock (this.locker)
+            lock (locker)
             {
                 foreach (var handler in handlers)
-                {
                     if (!handler.Sender.IsAlive)
-                    {
                         handlersToRemoveList.Add(handler);
-                    }
                     else if (handler.Type.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()))
-                    {
                         handlerList.Add(handler);
-                    }
-                }
 
-                foreach (var l in handlersToRemoveList)
-                {
-                    handlers.Remove(l);
-                }
+                foreach (var l in handlersToRemoveList) handlers.Remove(l);
             }
 
-            foreach (var l in handlerList)
-            {
-                ((Action<T>)l.Action)(data);
-            }
+            foreach (var l in handlerList) ((Action<T>) l.Action)(data);
         }
 
         /// <summary>
-        /// Allow subscribing directly to this Hub.
+        ///     Allow subscribing directly to this Hub.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler"></param>
@@ -77,14 +59,14 @@ namespace PubSub
                 Type = typeof(T)
             };
 
-            lock (this.locker)
+            lock (locker)
             {
-                this.handlers.Add(item);
+                handlers.Add(item);
             }
         }
 
         /// <summary>
-        /// Allow unsubscribing directly to this Hub.
+        ///     Allow unsubscribing directly to this Hub.
         /// </summary>
         public void Unsubscribe()
         {
@@ -93,20 +75,17 @@ namespace PubSub
 
         public void Unsubscribe(object sender)
         {
-            lock (this.locker)
+            lock (locker)
             {
-                var query = this.handlers.Where(a => !a.Sender.IsAlive ||
-                                                     a.Sender.Target.Equals(sender));
+                var query = handlers.Where(a => !a.Sender.IsAlive ||
+                                                a.Sender.Target.Equals(sender));
 
-                foreach (var h in query.ToList())
-                {
-                    this.handlers.Remove(h);
-                }
+                foreach (var h in query.ToList()) handlers.Remove(h);
             }
         }
 
         /// <summary>
-        /// Allow unsubscribing directly to this Hub.
+        ///     Allow unsubscribing directly to this Hub.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         public void Unsubscribe<T>()
@@ -115,33 +94,34 @@ namespace PubSub
         }
 
         /// <summary>
-        /// Allow unsubscribing directly to this Hub.
+        ///     Allow unsubscribing directly to this Hub.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler"></param>
         public void Unsubscribe<T>(Action<T> handler = null)
         {
-            Unsubscribe<T>(this, handler);
+            Unsubscribe(this, handler);
         }
 
         public void Unsubscribe<T>(object sender, Action<T> handler = null)
         {
-            lock (this.locker)
+            lock (locker)
             {
-                var query = this.handlers
+                var query = handlers
                     .Where(a => !a.Sender.IsAlive ||
-                                (a.Sender.Target.Equals(sender) && a.Type == typeof(T)));
+                                a.Sender.Target.Equals(sender) && a.Type == typeof(T));
 
-                if (handler != null)
-                {
-                    query = query.Where(a => a.Action.Equals(handler));
-                }
+                if (handler != null) query = query.Where(a => a.Action.Equals(handler));
 
-                foreach (var h in query.ToList())
-                {
-                    this.handlers.Remove(h);
-                }
+                foreach (var h in query.ToList()) handlers.Remove(h);
             }
+        }
+
+        internal class Handler
+        {
+            public Delegate Action { get; set; }
+            public WeakReference Sender { get; set; }
+            public Type Type { get; set; }
         }
     }
 }

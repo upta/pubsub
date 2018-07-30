@@ -2,52 +2,48 @@
 
 namespace PubSub
 {
-    static public class PubSubExtensions
+    public static class PubSubExtensions
     {
-        static private readonly Hub hub = new Hub();
+        private static readonly Hub hub = new Hub();
 
-        static public bool Exists<T>( this object obj )
+        public static bool Exists<T>(this object obj)
         {
-            foreach ( var h in hub.handlers )
-            {
-                if ( Equals(h.Sender.Target, obj ) &&
-                    typeof(T) == h.Type )
-                {
+            foreach (var h in hub.handlers)
+                if (Equals(h.Sender.Target, obj) &&
+                    typeof(T) == h.Type)
                     return true;
-                }
-            }
 
             return false;
         }
 
-        static public void Publish<T>( this object obj )
+        public static void Publish<T>(this object obj)
         {
-            hub.Publish( obj, default( T ) );
+            hub.Publish(obj, default(T));
         }
 
-        static public void Publish<T>( this object obj, T data )
+        public static void Publish<T>(this object obj, T data)
         {
-            hub.Publish( obj, data );
+            hub.Publish(obj, data);
         }
 
-        static public void Subscribe<T>( this object obj, Action<T> handler )
+        public static void Subscribe<T>(this object obj, Action<T> handler)
         {
-            hub.Subscribe( obj, handler );
+            hub.Subscribe(obj, handler);
         }
 
-        static public void Unsubscribe( this object obj )
+        public static void Unsubscribe(this object obj)
         {
-            hub.Unsubscribe( obj );
+            hub.Unsubscribe(obj);
         }
 
-        static public void Unsubscribe<T>( this object obj )
+        public static void Unsubscribe<T>(this object obj)
         {
-            hub.Unsubscribe( obj, (Action<T>) null );
+            hub.Unsubscribe(obj, (Action<T>) null);
         }
 
-        static public void Unsubscribe<T>( this object obj, Action<T> handler )
+        public static void Unsubscribe<T>(this object obj, Action<T> handler)
         {
-            hub.Unsubscribe( obj, handler );
+            hub.Unsubscribe(obj, handler);
         }
     }
 }

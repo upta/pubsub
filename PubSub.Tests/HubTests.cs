@@ -1,30 +1,26 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading.Tasks;
 
 namespace PubSub.Tests
 {
     [TestClass]
     public class HubTests
     {
-        class Event { }
-        class SpecialEvent : Event { }
-        
         [TestMethod]
         public void Publish_CallsAllRegisteredActions()
         {
             // arrange
             var hub = new Hub();
-            int callCount = 0;
-            hub.Subscribe( new object(), new Action<string>( a => callCount++ ) );
-            hub.Subscribe( new object(), new Action<string>( a => callCount++ ) );
+            var callCount = 0;
+            hub.Subscribe(new object(), new Action<string>(a => callCount++));
+            hub.Subscribe(new object(), new Action<string>(a => callCount++));
 
             // act
-            hub.Publish( null, default( string ) );
+            hub.Publish(null, default(string));
 
             // assert
-            Assert.AreEqual( 2, callCount );
+            Assert.AreEqual(2, callCount);
         }
 
         [TestMethod]
@@ -33,15 +29,15 @@ namespace PubSub.Tests
             // arrange
             var hub = new Hub();
             var sender = new object();
-            int callCount = 0;
-            hub.Subscribe<SpecialEvent>( sender, new Action<SpecialEvent>( a => callCount++ ) );
-            hub.Subscribe<Event>( sender, new Action<Event>( a => callCount++ ) );
+            var callCount = 0;
+            hub.Subscribe<Event>(sender, a => callCount++);
+            hub.Subscribe(sender, new Action<Event>(a => callCount++));
 
             // act
-            hub.Publish<SpecialEvent>( sender, new SpecialEvent() );
+            hub.Publish(sender, new SpecialEvent());
 
             // assert
-            Assert.AreEqual( 2, callCount );
+            Assert.AreEqual(2, callCount);
         }
 
         [TestMethod]
@@ -50,15 +46,15 @@ namespace PubSub.Tests
             // arrange
             var hub = new Hub();
             var sender = new object();
-            int callCount = 0;
-            hub.Subscribe<SpecialEvent>( sender, new Action<SpecialEvent>( a => callCount++ ) );
-            hub.Subscribe<Event>( sender, new Action<Event>( a => callCount++ ) );
+            var callCount = 0;
+            hub.Subscribe(sender, new Action<SpecialEvent>(a => callCount++));
+            hub.Subscribe(sender, new Action<Event>(a => callCount++));
 
             // act
-            hub.Publish<Event>( sender, new Event() );
+            hub.Publish(sender, new Event());
 
             // assert
-            Assert.AreEqual( 1, callCount );
+            Assert.AreEqual(1, callCount);
         }
 
 
@@ -71,16 +67,16 @@ namespace PubSub.Tests
             var liveSender = new object();
 
             // act
-            hub.Subscribe( condemnedSender, new Action<string>( a => { } ) );
-            hub.Subscribe( liveSender, new Action<string>( a => { } ) );
+            hub.Subscribe(condemnedSender, new Action<string>(a => { }));
+            hub.Subscribe(liveSender, new Action<string>(a => { }));
 
             condemnedSender = null;
             GC.Collect();
 
-            hub.Publish( null, default( string ) );
+            hub.Publish(null, default(string));
 
             // assert
-            Assert.AreEqual( 1, hub.handlers.Count );
+            Assert.AreEqual(1, hub.handlers.Count);
         }
 
 
@@ -90,16 +86,16 @@ namespace PubSub.Tests
             // arrange
             var hub = new Hub();
             var sender = new object();
-            var action = new Action<string>( a => { } );
+            var action = new Action<string>(a => { });
 
             // act
-            hub.Subscribe( sender, action );
+            hub.Subscribe(sender, action);
 
             // assert
             var h = hub.handlers.First();
-            Assert.AreEqual( sender, h.Sender.Target );
-            Assert.AreEqual( action, h.Action );
-            Assert.AreEqual( action.Method.GetParameters().First().ParameterType, h.Type );
+            Assert.AreEqual(sender, h.Sender.Target);
+            Assert.AreEqual(action, h.Action);
+            Assert.AreEqual(action.Method.GetParameters().First().ParameterType, h.Type);
         }
 
 
@@ -110,15 +106,15 @@ namespace PubSub.Tests
             var hub = new Hub();
             var sender = new object();
             var preservedSender = new object();
-            
+
             // act
             hub.Subscribe(preservedSender, new Action<string>(a => { }));
             hub.Subscribe(sender, new Action<string>(a => { }));
             hub.Unsubscribe(sender);
 
             // assert
-            Assert.IsTrue(hub.handlers.Any( a => a.Sender.Target == preservedSender ));
-            Assert.IsFalse( hub.handlers.Any( a => a.Sender.Target == sender ) );
+            Assert.IsTrue(hub.handlers.Any(a => a.Sender.Target == preservedSender));
+            Assert.IsFalse(hub.handlers.Any(a => a.Sender.Target == sender));
         }
 
         [TestMethod]
@@ -128,15 +124,15 @@ namespace PubSub.Tests
             var hub = new Hub();
             var sender = new object();
             var preservedSender = new object();
-            hub.Subscribe( sender, new Action<string>( a => { } ) );
-            hub.Subscribe( sender, new Action<string>( a => { } ) );
-            hub.Subscribe( preservedSender, new Action<string>( a => { } ) );
+            hub.Subscribe(sender, new Action<string>(a => { }));
+            hub.Subscribe(sender, new Action<string>(a => { }));
+            hub.Subscribe(preservedSender, new Action<string>(a => { }));
 
             // act
-            hub.Unsubscribe<string>( sender, null );
+            hub.Unsubscribe<string>(sender);
 
             // assert
-            Assert.IsFalse( hub.handlers.Any( a => a.Sender.Target == sender ) );
+            Assert.IsFalse(hub.handlers.Any(a => a.Sender.Target == sender));
         }
 
         [TestMethod]
@@ -146,19 +142,19 @@ namespace PubSub.Tests
             var hub = new Hub();
             var sender = new object();
             var preservedSender = new object();
-            var actionToDie = new Action<string>( a => { } );
-            hub.Subscribe( sender, actionToDie );
-            hub.Subscribe( sender, new Action<string>( a => { } ) );
-            hub.Subscribe( preservedSender, new Action<string>( a => { } ) );
+            var actionToDie = new Action<string>(a => { });
+            hub.Subscribe(sender, actionToDie);
+            hub.Subscribe(sender, new Action<string>(a => { }));
+            hub.Subscribe(preservedSender, new Action<string>(a => { }));
 
             // act
-            hub.Unsubscribe<string>( sender, actionToDie );
+            hub.Unsubscribe(sender, actionToDie);
 
             // assert
-            Assert.IsFalse( hub.handlers.Any( a => a.Action.Equals( actionToDie ) ) );
+            Assert.IsFalse(hub.handlers.Any(a => a.Action.Equals(actionToDie)));
         }
 
-         [TestMethod]
+        [TestMethod]
         public void Exists_Static()
         {
             // arrange
@@ -186,7 +182,7 @@ namespace PubSub.Tests
 
             // assert
             Assert.IsFalse(exists);
-            
+
             this.Unsubscribe(action);
         }
 
@@ -200,9 +196,9 @@ namespace PubSub.Tests
 
             // act
             hub.Subscribe(sender, action);
-            
+
             // assert
-            Assert.IsTrue( hub.handlers.Any( a => a.Action.Equals( action ) ) );
+            Assert.IsTrue(hub.handlers.Any(a => a.Action.Equals(action)));
         }
 
 
@@ -213,34 +209,34 @@ namespace PubSub.Tests
             var hub = new Hub();
             var sender = new object();
             var condemnedSender = new object();
-            var actionToDie = new Action<string>( a => { } );
-            hub.Subscribe( sender, actionToDie );
-            hub.Subscribe( sender, new Action<string>( a => { } ) );
-            hub.Subscribe( condemnedSender, new Action<string>( a => { } ) );
+            var actionToDie = new Action<string>(a => { });
+            hub.Subscribe(sender, actionToDie);
+            hub.Subscribe(sender, new Action<string>(a => { }));
+            hub.Subscribe(condemnedSender, new Action<string>(a => { }));
 
             condemnedSender = null;
 
             GC.Collect();
 
             // act
-            hub.Unsubscribe<string>( sender );
+            hub.Unsubscribe<string>(sender);
 
             // assert
-            Assert.AreEqual( 0, hub.handlers.Count );
+            Assert.AreEqual(0, hub.handlers.Count);
         }
 
         [TestMethod]
         public void PublishExtensions()
         {
             // arrange
-            int callCount = 0;
+            var callCount = 0;
 
-            this.Subscribe<Event>(new Action<Event>(a => callCount++));
+            this.Subscribe(new Action<Event>(a => callCount++));
             this.Subscribe(new Action<Event>(a => callCount++));
 
             // act
             this.Publish(new Event());
-            this.Publish<SpecialEvent>(new SpecialEvent());
+            this.Publish(new SpecialEvent());
             this.Publish<Event>();
 
             // assert
@@ -251,21 +247,21 @@ namespace PubSub.Tests
         public void PubSubUnsubDirectlyToHub()
         {
             // arrange
-            int callCount = 0;
+            var callCount = 0;
             var action = new Action<Event>(a => callCount++);
             var myhub = new Hub();
 
             // before change, this lies and subscribes to the static hub instead.
-            myhub.Subscribe<Event>(new Action<Event>(a => callCount++));
+            myhub.Subscribe(new Action<Event>(a => callCount++));
             myhub.Subscribe(new Action<SpecialEvent>(a => callCount++));
             myhub.Subscribe(action);
 
             // act
-            
+
             // before change, this uses the static hub in the Extensions.
             myhub.Publish(new Event());
             // before change, this uses myhub which has no listeners.
-            myhub.Publish<SpecialEvent>(new SpecialEvent());
+            myhub.Publish(new SpecialEvent());
             // before change, this uses the static hub in the Extensions.
             myhub.Publish<Event>();
 
@@ -278,7 +274,7 @@ namespace PubSub.Tests
 
             // act
             myhub.Publish(new SpecialEvent());
-            
+
             // assert
             Assert.AreEqual(9, callCount);
 
@@ -305,16 +301,16 @@ namespace PubSub.Tests
         public void UnsubscribeExtensions()
         {
             // arrange
-            int callCount = 0;
+            var callCount = 0;
             var action = new Action<Event>(a => callCount++);
 
-            this.Subscribe<Event>(new Action<Event>(a => callCount++));
+            this.Subscribe(new Action<Event>(a => callCount++));
             this.Subscribe(new Action<SpecialEvent>(a => callCount++));
             this.Subscribe(action);
 
             // act
             this.Publish(new Event());
-            this.Publish<SpecialEvent>(new SpecialEvent());
+            this.Publish(new SpecialEvent());
             this.Publish<Event>();
 
             // assert
@@ -346,6 +342,14 @@ namespace PubSub.Tests
 
             // assert
             Assert.AreEqual(10, callCount);
+        }
+
+        private class Event
+        {
+        }
+
+        private class SpecialEvent : Event
+        {
         }
     }
 }
