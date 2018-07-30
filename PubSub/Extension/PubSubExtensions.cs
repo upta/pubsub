@@ -1,6 +1,7 @@
 ﻿using System;
+using PubSub.Core;
 
-namespace PubSub
+namespace PubSub.Extension
 {
     public static class PubSubExtensions
     {

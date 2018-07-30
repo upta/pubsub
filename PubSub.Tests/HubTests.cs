@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PubSub.Core;
+using PubSub.Extension;
 
 namespace PubSub.Tests
 {

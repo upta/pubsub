@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace PubSub
+namespace PubSub.Core
 {
     public class Hub
     {
