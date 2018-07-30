@@ -3,7 +3,7 @@
 An extremely light-weight, easy to use .Net pub/sub library 
 
 ### The idea
-* Provide the ability to do de-coupled communitcation without having to include some large (and often opinionated) framework when all you want is pubsub
+* Provide the ability to do de-coupled communication without having to include some large (and often opinionated) framework when all you want is pubsub
 * It should be portable so it can be used pretty much wherever
 * Make it stupid simple to use with zero setup
 
