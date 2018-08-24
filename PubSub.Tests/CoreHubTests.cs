@@ -86,6 +86,7 @@ namespace PubSub.Tests
 
             // assert
             Assert.AreEqual(1, hub.handlers.Count);
+            GC.KeepAlive(liveSender);
         }
 
 
