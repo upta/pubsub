@@ -2,6 +2,6 @@
 {
     public interface IPublisher
     {
-        void Publish<T>(object sender,T data);
+        void Publish<T>( object sender, T data );
     }
 }

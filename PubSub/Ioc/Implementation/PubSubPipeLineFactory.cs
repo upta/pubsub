@@ -11,15 +11,9 @@ namespace PubSub
             hub = new Hub();
         }
 
-        
-        public IPublisher GetPublisher()
-        {
-            return new Publisher(hub);
-        }
 
-        public ISubscriber GetSubscriber()
-        {
-            return new Subscriber(hub);
-        }
+        public IPublisher GetPublisher() => new Publisher( hub );
+
+        public ISubscriber GetSubscriber() => new Subscriber( hub );
     }
 }

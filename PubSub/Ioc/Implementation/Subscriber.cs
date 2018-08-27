@@ -5,40 +5,23 @@ namespace PubSub
 {
     public class Subscriber : ISubscriber
     {
-        public Subscriber(Hub hub)
+        private readonly Hub hub;
+
+        public Subscriber( Hub hub )
         {
             this.hub = hub;
         }
 
-        private readonly Hub hub;
-        public void Subscribe<T>(object subscriber, Action<T> handler )
-        {
-            hub.Subscribe( subscriber, handler );
-        }
+        public bool Exists<T>( object subscriber ) => hub.Exists<T>( subscriber );
 
-        public void Unsubscribe(object subscriber )
-        {
-            hub.Unsubscribe( subscriber );
-        }
+        public bool Exists<T>( object subscriber, Action<T> handler ) => hub.Exists( subscriber, handler );
 
-        public void Unsubscribe<T>(object subscriber )
-        {
-            hub.Unsubscribe( subscriber, (Action<T>) null );
-        }
+        public void Subscribe<T>( object subscriber, Action<T> handler ) => hub.Subscribe( subscriber, handler );
 
-        public void Unsubscribe<T>(object subscriber, Action<T> handler )
-        {
-            hub.Unsubscribe( subscriber, handler );
-        }
+        public void Unsubscribe( object subscriber ) => hub.Unsubscribe( subscriber );
 
-        public bool Exists<T>(object subscriber)
-        {
-            return hub.Exists<T>(subscriber);
-        }
+        public void Unsubscribe<T>( object subscriber ) => hub.Unsubscribe( subscriber, (Action<T>) null );
 
-        public bool Exists<T>(object subscriber, Action<T> handler)
-        {
-            return hub.Exists<T>(subscriber, handler);
-        }
+        public void Unsubscribe<T>( object subscriber, Action<T> handler ) => hub.Unsubscribe( subscriber, handler );
     }
 }
