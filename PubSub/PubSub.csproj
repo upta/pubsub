@@ -18,7 +18,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageTags>portable;pubsub;eventaggregator;c#</PackageTags>
     <Description>An extremely light-weight, easy to use .Net pub/sub library</Description>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <!--End of Nuspec metadata-->
   </PropertyGroup>
