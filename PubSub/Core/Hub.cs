@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace PubSub.Core
 {
@@ -11,17 +12,15 @@ namespace PubSub.Core
 
         internal object locker = new object();
 
+
         /// <summary>
         ///     Allow publishing directly onto this Hub.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
-        public void Publish<T>( T data = default( T ) )
-        {
-            Publish( this, data );
-        }
+        public async Task Publish<T>( T data = default( T ) ) => await Publish( this, data );
 
-        public void Publish<T>( object sender, T data = default( T ) )
+        public async Task Publish<T>( object sender, T data = default( T ) )
         {
             List<Handler> handlerList;
 
@@ -51,42 +50,36 @@ namespace PubSub.Core
 
             foreach ( var l in handlerList )
             {
-                ( (Action<T>) l.Action )( data );
+                if ( l.Action is Func<T, Task> action )
+                {
+                    await action( data );
+                }
+                else
+                {
+                    ( (Action<T>) l.Action )( data );
+                }
             }
         }
+
 
         /// <summary>
         ///     Allow subscribing directly to this Hub.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler"></param>
-        public void Subscribe<T>( Action<T> handler )
-        {
-            Subscribe( this, handler );
-        }
+        public void Subscribe<T>( Action<T> handler ) => Subscribe( this, handler );
 
-        public void Subscribe<T>( object subscriber, Action<T> handler )
-        {
-            var item = new Handler
-            {
-                Action = handler,
-                Sender = new WeakReference( subscriber ),
-                Type = typeof( T )
-            };
+        public void Subscribe<T>( object subscriber, Action<T> handler ) => StoreHandler( subscriber, typeof( T ), handler );
 
-            lock ( locker )
-            {
-                handlers.Add( item );
-            }
-        }
+        public void Subscribe<T>( Func<T, Task> handler ) => Subscribe( this, handler );
+
+        public void Subscribe<T>( object subscriber, Func<T, Task> handler ) => StoreHandler( subscriber, typeof( T ), handler );
+
 
         /// <summary>
         ///     Allow unsubscribing directly to this Hub.
         /// </summary>
-        public void Unsubscribe()
-        {
-            Unsubscribe( this );
-        }
+        public void Unsubscribe() => Unsubscribe( this );
 
         public void Unsubscribe( object subscriber )
         {
@@ -106,20 +99,14 @@ namespace PubSub.Core
         ///     Allow unsubscribing directly to this Hub.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        public void Unsubscribe<T>()
-        {
-            Unsubscribe<T>( this );
-        }
+        public void Unsubscribe<T>() => Unsubscribe<T>( this );
 
         /// <summary>
         ///     Allow unsubscribing directly to this Hub.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler"></param>
-        public void Unsubscribe<T>( Action<T> handler )
-        {
-            Unsubscribe( this, handler );
-        }
+        public void Unsubscribe<T>( Action<T> handler ) => Unsubscribe( this, handler );
 
         public void Unsubscribe<T>( object subscriber, Action<T> handler = null )
         {
@@ -139,6 +126,7 @@ namespace PubSub.Core
                 }
             }
         }
+
 
         public bool Exists<T>( object subscriber )
         {
@@ -174,6 +162,23 @@ namespace PubSub.Core
 
             return false;
         }
+
+
+        private void StoreHandler( object subscriber, Type type, Delegate handler )
+        {
+            var item = new Handler
+            {
+                Action = handler,
+                Sender = new WeakReference( subscriber ),
+                Type = type
+            };
+
+            lock ( locker )
+            {
+                handlers.Add( item );
+            }
+        }
+
 
         internal class Handler
         {
