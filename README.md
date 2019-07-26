@@ -20,7 +20,7 @@ There are lots of good applications for the publish/subscribe patterns.  Have a 
 ### How to use it
 First, add a using.
 ```c#
-using PubSub;
+using PubSub.Extension;
 ```
 
 Listen for stuff you might be interested in.
