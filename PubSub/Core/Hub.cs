@@ -69,7 +69,7 @@ namespace PubSub.Core
             SubscribeDelegate<T>(subscriber, handler);
         }
 
-        public void SubscribeTask<T>(object subscriber, Func<T, Task> handler)
+        public void Subscribe<T>(object subscriber, Func<T, Task> handler)
         {
             SubscribeDelegate<T>(subscriber, handler);
         }

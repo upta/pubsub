@@ -21,7 +21,7 @@ namespace PubSub.Extension
 
         public static void Subscribe<T>(this object obj, Action<T> handler) => hub.Subscribe(obj, handler);
 
-        public static void SubscribeTask<T>(this object obj, Func<T, Task> handler) => hub.SubscribeTask(obj, handler);
+        public static void Subscribe<T>(this object obj, Func<T, Task> handler) => hub.Subscribe(obj, handler);
 
         public static void Unsubscribe(this object obj) => hub.Unsubscribe(obj);
 

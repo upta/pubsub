@@ -16,7 +16,7 @@ namespace PubSub.Tests
             var callCount = 0;
 
             this.Subscribe(new Action<Event>(a => callCount++));
-            this.SubscribeTask(new Func<Event, Task>(e =>
+            this.Subscribe(new Func<Event, Task>(e =>
             {
                 return Task.Run(() =>
                 {
@@ -41,7 +41,7 @@ namespace PubSub.Tests
             var callCount = 0;
 
             this.Subscribe(new Action<Event>(a => callCount++));
-            this.SubscribeTask(new Func<Event, Task>(e =>
+            this.Subscribe(new Func<Event, Task>(e =>
             {
                 return Task.Run(() =>
                 {
@@ -66,7 +66,7 @@ namespace PubSub.Tests
             var callCount = 0;
 
             this.Subscribe(new Action<Event>(a => callCount++));
-            this.SubscribeTask(new Func<Event, Task>(e =>
+            this.Subscribe(new Func<Event, Task>(e =>
             {
                 return Task.Run(() =>
                 {
