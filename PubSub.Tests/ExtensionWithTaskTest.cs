@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PubSub.Extension;
 
 namespace PubSub.Tests
 {
@@ -12,23 +11,23 @@ namespace PubSub.Tests
         [TestMethod]
         public void Subscribe_With_Action_And_Func_Publish_All()
         {
-            // arrange
+            var hub = new Hub();
             var callCount = 0;
 
-            this.Subscribe(new Action<Event>(a => callCount++));
-            this.Subscribe(new Func<Event, Task>(e =>
+            hub.Subscribe(new Action<Event>(a => callCount++));
+            hub.Subscribe(new Func<Event, Task>(e =>
             {
                 return Task.Run(() =>
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(200);
                     return callCount++;
                 });
             }));
 
             // act
-            this.Publish(new Event());
-            this.Publish(new SpecialEvent());
-            this.Publish<Event>();
+            hub.Publish(new Event());
+            hub.Publish(new SpecialEvent());
+            hub.Publish<Event>();
 
             // assert
             Assert.AreEqual(3, callCount);
@@ -37,23 +36,23 @@ namespace PubSub.Tests
         [TestMethod]
         public void Subscribe_With_Action_And_Func_Publish_One_As_Async()
         {
-            // arrange
+            var hub = new Hub();
             var callCount = 0;
 
-            this.Subscribe(new Action<Event>(a => callCount++));
-            this.Subscribe(new Func<Event, Task>(e =>
+            hub.Subscribe(new Action<Event>(a => callCount++));
+            hub.Subscribe(new Func<Event, Task>(e =>
             {
                 return Task.Run(() =>
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(200);
                     return callCount++;
                 });
             }));
 
             // act
-            this.PublishAsync(new Event()).Wait();
-            this.Publish(new SpecialEvent());
-            this.Publish<Event>();
+            hub.PublishAsync(new Event()).Wait();
+            hub.Publish(new SpecialEvent());
+            hub.Publish<Event>();
 
             // assert
             Assert.AreEqual(4, callCount);
@@ -62,23 +61,23 @@ namespace PubSub.Tests
         [TestMethod]
         public void Subscribe_With_Action_And_Func_Publish_All_As_Async()
         {
-            // arrange
+            var hub = new Hub();
             var callCount = 0;
 
-            this.Subscribe(new Action<Event>(a => callCount++));
-            this.Subscribe(new Func<Event, Task>(e =>
+            hub.Subscribe(new Action<Event>(a => callCount++));
+            hub.Subscribe(new Func<Event, Task>(e =>
             {
                 return Task.Run(() =>
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(200);
                     return callCount++;
                 });
             }));
 
             // act
-            this.PublishAsync(new Event()).Wait();
-            this.PublishAsync(new SpecialEvent()).Wait();
-            this.PublishAsync<Event>().Wait();
+            hub.PublishAsync(new Event()).Wait();
+            hub.PublishAsync(new SpecialEvent()).Wait();
+            hub.PublishAsync<Event>().Wait();
 
             // assert
             Assert.AreEqual(6, callCount);

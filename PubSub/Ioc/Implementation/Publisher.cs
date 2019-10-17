@@ -1,6 +1,4 @@
-﻿using PubSub.Core;
-
-namespace PubSub
+﻿namespace PubSub
 {
     public class Publisher : IPublisher
     {
@@ -11,6 +9,6 @@ namespace PubSub
             this.hub = hub;
         }
 
-        public void Publish<T>( object sender, T data ) => hub.Publish( sender, data );
+        public void Publish<T>(T data) => hub.Publish(data);
     }
 }

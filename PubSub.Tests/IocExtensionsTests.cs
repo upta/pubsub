@@ -29,7 +29,7 @@ namespace PubSub.Tests
             subscriber.Subscribe<Event>(sender, a => callCount++);
             subscriber.Subscribe(sender, new Action<Event>(a => callCount++));
 
-            publisher.Publish(sender, new SpecialEvent());
+            publisher.Publish(new SpecialEvent());
 
             Assert.AreEqual(2, callCount);
         }

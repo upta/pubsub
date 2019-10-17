@@ -1,5 +1,4 @@
 ﻿using System;
-using PubSub.Core;
 
 namespace PubSub
 {
