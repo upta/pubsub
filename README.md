@@ -2,6 +2,9 @@
 
 An extremely light-weight, easy to use .Net pub/sub library 
 
+### Breaking change in 4.0
+In an effort to clean up some old bad habits, version 4.0 and beyond no longer has extension methods on object for Publish and Subscribe. The easiest migration solution would be to simply use those methods on the new Hub.Default static instance.
+
 ### The idea
 * Provide the ability to do de-coupled communication without having to include some large (and often opinionated) framework when all you want is pubsub
 * It should be portable so it can be used pretty much wherever
