@@ -4,51 +4,43 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace PubSub.Core
+namespace PubSub
 {
     public class Hub
     {
-        internal List<Handler> handlers = new List<Handler>();
+        internal List<Handler> _handlers = new List<Handler>();
+        internal object _locker = new object();
+        private static Hub _default;
 
-        internal object locker = new object();
-
-        /// <summary>
-        ///     Allow publishing directly onto this Hub.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="data"></param>
+        public static Hub Default => _default ?? (_default = new Hub());
+        
         public void Publish<T>(T data = default(T))
         {
-            Publish(this, data);
-        }
-
-        public void Publish<T>(object sender, T data = default(T))
-        {
-            foreach (var l in GetAliveHandlers<T>())
+            foreach (var handler in GetAliveHandlers<T>())
             {
-                switch (l.Action)
+                switch (handler.Action)
                 {
-                    case Action<T> lAction:
-                        lAction(data);
+                    case Action<T> action:
+                        action(data);
                         break;
-                    case Func<T, Task> lFunc:
-                        lFunc(data);
+                    case Func<T, Task> func:
+                        func(data);
                         break;
                 }
             }
         }
 
-        public async Task PublishAsync<T>(object sender, T data = default(T))
+        public async Task PublishAsync<T>(T data = default(T))
         {
-            foreach (var l in GetAliveHandlers<T>())
+            foreach (var handler in GetAliveHandlers<T>())
             {
-                switch (l.Action)
+                switch (handler.Action)
                 {
-                    case Action<T> lAction:
-                        lAction(data);
+                    case Action<T> action:
+                        action(data);
                         break;
-                    case Func<T, Task> lFunc:
-                        await lFunc(data);
+                    case Func<T, Task> func:
+                        await func(data);
                         break;
                 }
             }
@@ -69,6 +61,11 @@ namespace PubSub.Core
             SubscribeDelegate<T>(subscriber, handler);
         }
 
+        public void Subscribe<T>(Func<T, Task> handler)
+        {
+            Subscribe(this, handler);
+        }
+
         public void Subscribe<T>(object subscriber, Func<T, Task> handler)
         {
             SubscribeDelegate<T>(subscriber, handler);
@@ -84,15 +81,13 @@ namespace PubSub.Core
 
         public void Unsubscribe(object subscriber)
         {
-            lock (locker)
+            lock (_locker)
             {
-                var query = handlers.Where(a => !a.Sender.IsAlive ||
+                var query = _handlers.Where(a => !a.Sender.IsAlive ||
                                                 a.Sender.Target.Equals(subscriber));
 
                 foreach (var h in query.ToList())
-                {
-                    handlers.Remove(h);
-                }
+                    _handlers.Remove(h);
             }
         }
 
@@ -117,28 +112,29 @@ namespace PubSub.Core
 
         public void Unsubscribe<T>(object subscriber, Action<T> handler = null)
         {
-            lock (locker)
+            lock (_locker)
             {
-                var query = handlers.Where(a => !a.Sender.IsAlive ||
+                var query = _handlers.Where(a => !a.Sender.IsAlive ||
                                                 a.Sender.Target.Equals(subscriber) && a.Type == typeof(T));
 
                 if (handler != null)
-                {
                     query = query.Where(a => a.Action.Equals(handler));
-                }
 
                 foreach (var h in query.ToList())
-                {
-                    handlers.Remove(h);
-                }
+                    _handlers.Remove(h);
             }
+        }
+
+        public bool Exists<T>()
+        {
+            return Exists<T>(this);
         }
 
         public bool Exists<T>(object subscriber)
         {
-            lock (locker)
+            lock (_locker)
             {
-                foreach (var h in handlers)
+                foreach (var h in _handlers)
                 {
                     if (Equals(h.Sender.Target, subscriber) &&
                          typeof(T) == h.Type)
@@ -153,9 +149,9 @@ namespace PubSub.Core
 
         public bool Exists<T>(object subscriber, Action<T> handler)
         {
-            lock (locker)
+            lock (_locker)
             {
-                foreach (var h in handlers)
+                foreach (var h in _handlers)
                 {
                     if (Equals(h.Sender.Target, subscriber) &&
                          typeof(T) == h.Type &&
@@ -178,41 +174,28 @@ namespace PubSub.Core
                 Type = typeof(T)
             };
 
-            lock (locker)
+            lock (_locker)
             {
-                handlers.Add(item);
+                _handlers.Add(item);
             }
         }
 
         private IEnumerable<Handler> GetAliveHandlers<T>()
         {
-            List<Handler> handlerList;
+            PruneHandlers();
+            return _handlers.Where(h => h.Type.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()));
+        }
 
-            lock (locker)
+        private void PruneHandlers()
+        {
+            lock (_locker)
             {
-                handlerList = new List<Handler>(handlers.Count);
-
-                var handlersToRemove = new List<Handler>(handlers.Count);
-
-                foreach (var handler in handlers)
+                for (int i = _handlers.Count - 1; i >= 0; --i)
                 {
-                    if (!handler.Sender.IsAlive)
-                    {
-                        handlersToRemove.Add(handler);
-                    }
-                    else if (handler.Type.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()))
-                    {
-                        handlerList.Add(handler);
-                    }
-                }
-
-                foreach (var l in handlersToRemove)
-                {
-                    handlers.Remove(l);
+                    if (!_handlers[i].Sender.IsAlive)
+                        _handlers.RemoveAt(i);
                 }
             }
-
-            return handlerList;
         }
 
         internal class Handler

@@ -20,7 +20,7 @@ There are lots of good applications for the publish/subscribe patterns.  Have a 
 ### How to use it
 First, add a using.
 ```c#
-using PubSub.Extension;
+using PubSub;
 ```
 
 Listen for stuff you might be interested in.
@@ -28,9 +28,11 @@ Listen for stuff you might be interested in.
 ```c#
 public class Page
 {
+    Hub hub = Hub.Default;
+	
 	public Page()
 	{
-		this.Subscribe<Product>( product =>
+		hub.Subscribe<Product>(this, product =>
 		{
 			// highly interesting things
 		});
@@ -43,9 +45,11 @@ Tell others that interesting things happened.
 ```c#
 public class OtherPage
 {
+    Hub hub = Hub.Default;
+	
 	public void ProductPurchased()
 	{
-		this.Publish( new Product() );
+		hub.Publish( new Product() );
 	}
 }
 ```
@@ -55,9 +59,11 @@ Stop listening when you don't care anymore.
 ```c#
 public class Page
 {
+	Hub hub = Hub.Default;
+	
 	public void WereDoneHere()
 	{
-		this.Unsubscribe<Product>();
+		hub.Unsubscribe<Product>();
 	}
 }
 ```
@@ -75,6 +81,9 @@ To keep things simple, yet flexible, PubSub PCL is implemented using two core id
 	Install-Package PubSub
 
 ![nuget dialog image for PubSub PCL](http://i.imgur.com/jH6ONPg.png "Nuget dialog for PubSub PCL")
+
+### Target Frameworks
+* .Net Standard 1.1 / 2.0
 
 ### Currently supported platforms
 * .Net Framwork 4.5 / 4.5.1

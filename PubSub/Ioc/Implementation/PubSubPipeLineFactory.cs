@@ -1,6 +1,4 @@
-﻿using PubSub.Core;
-
-namespace PubSub
+﻿namespace PubSub
 {
     public class PubSubPipelineFactory : IPubSubPipelineFactory
     {
@@ -10,7 +8,6 @@ namespace PubSub
         {
             hub = new Hub();
         }
-
 
         public IPublisher GetPublisher() => new Publisher( hub );
 

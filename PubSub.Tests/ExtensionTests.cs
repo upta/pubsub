@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PubSub.Extension;
 
 namespace PubSub.Tests
 {
@@ -10,48 +9,48 @@ namespace PubSub.Tests
         [TestMethod]
         public void Exists_Static()
         {
-            // arrange
+            var hub = new Hub();
             var action = new Action<string>(a => { });
-            this.Subscribe(action);
+            hub.Subscribe(action);
 
             // act
-            var exists = this.Exists<string>();
+            var exists = hub.Exists<string>();
 
             // assert
             Assert.IsTrue(exists);
 
-            this.Unsubscribe(action);
+            hub.Unsubscribe(action);
         }
 
         [TestMethod]
         public void NotExists_Static()
         {
-            // arrange
+            var hub = new Hub();
             var action = new Action<bool>(a => { });
-            this.Subscribe(action);
+            hub.Subscribe(action);
 
             // act
-            var exists = this.Exists<string>();
+            var exists = hub.Exists<string>();
 
             // assert
             Assert.IsFalse(exists);
 
-            this.Unsubscribe(action);
+            hub.Unsubscribe(action);
         }
 
         [TestMethod]
         public void PublishExtensions()
         {
-            // arrange
+            var hub = new Hub();
             var callCount = 0;
 
-            this.Subscribe(new Action<Event>(a => callCount++));
-            this.Subscribe(new Action<Event>(a => callCount++));
+            hub.Subscribe(new Action<Event>(a => callCount++));
+            hub.Subscribe(new Action<Event>(a => callCount++));
 
             // act
-            this.Publish(new Event());
-            this.Publish(new SpecialEvent());
-            this.Publish<Event>();
+            hub.Publish(new Event());
+            hub.Publish(new SpecialEvent());
+            hub.Publish<Event>();
 
             // assert
             Assert.AreEqual(6, callCount);
@@ -60,45 +59,45 @@ namespace PubSub.Tests
         [TestMethod]
         public void UnsubscribeExtensions()
         {
-            // arrange
+            var hub = new Hub();
             var callCount = 0;
             var action = new Action<Event>(a => callCount++);
 
-            this.Subscribe(new Action<Event>(a => callCount++));
-            this.Subscribe(new Action<SpecialEvent>(a => callCount++));
-            this.Subscribe(action);
+            hub.Subscribe(new Action<Event>(a => callCount++));
+            hub.Subscribe(new Action<SpecialEvent>(a => callCount++));
+            hub.Subscribe(action);
 
             // act
-            this.Publish(new Event());
-            this.Publish(new SpecialEvent());
-            this.Publish<Event>();
+            hub.Publish(new Event());
+            hub.Publish(new SpecialEvent());
+            hub.Publish<Event>();
 
             // assert
             Assert.AreEqual(7, callCount);
 
             // unsubscribe
-            this.Unsubscribe<SpecialEvent>();
+            hub.Unsubscribe<SpecialEvent>();
 
             // act
-            this.Publish<SpecialEvent>();
+            hub.Publish<SpecialEvent>();
 
             // assert
             Assert.AreEqual(9, callCount);
 
             // unsubscribe specific action
-            this.Unsubscribe(action);
+            hub.Unsubscribe(action);
 
             // act
-            this.Publish<SpecialEvent>();
+            hub.Publish<SpecialEvent>();
 
             // assert
             Assert.AreEqual(10, callCount);
 
             // unsubscribe from all
-            this.Unsubscribe();
+            hub.Unsubscribe();
 
             // act
-            this.Publish<SpecialEvent>();
+            hub.Publish<SpecialEvent>();
 
             // assert
             Assert.AreEqual(10, callCount);
