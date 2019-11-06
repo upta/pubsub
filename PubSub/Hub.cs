@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PubSub
 {
-    public class Hub
+    public class Hub : IHub
     {
         internal List<Handler> _handlers = new List<Handler>();
         internal object _locker = new object();
@@ -14,7 +14,7 @@ namespace PubSub
 
         public static Hub Default => _default ?? (_default = new Hub());
         
-        public void Publish<T>(T data = default(T))
+        public void Publish<T>(T data = default)
         {
             foreach (var handler in GetAliveHandlers<T>())
             {
@@ -30,7 +30,7 @@ namespace PubSub
             }
         }
 
-        public async Task PublishAsync<T>(T data = default(T))
+        public async Task PublishAsync<T>(T data = default)
         {
             foreach (var handler in GetAliveHandlers<T>())
             {
@@ -180,10 +180,13 @@ namespace PubSub
             }
         }
 
-        private IEnumerable<Handler> GetAliveHandlers<T>()
+        private List<Handler> GetAliveHandlers<T>()
         {
             PruneHandlers();
-            return _handlers.Where(h => h.Type.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()));
+            lock (_locker)
+            {
+                return _handlers.Where(h => h.Type.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo())).ToList();
+            }
         }
 
         private void PruneHandlers()
