@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace PubSub.Tests
 {
     [TestClass]
-    public class CoreHubTests
+    public class HubTests
     {
         private Hub _hub;
         private object _subscriber;
