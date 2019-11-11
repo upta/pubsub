@@ -88,6 +88,33 @@ namespace PubSub.Tests
         }
 
         [TestMethod]
+        public void Publish_NoExceptionRaisedWhenHandlerCreatesNewSubscriber()
+        {
+            // arrange
+            _hub.Subscribe(new Action<Event>(a => new Stuff(_hub)));
+
+            // act
+            try
+            {
+                _hub.Publish(new Event());
+            }
+
+            // assert
+            catch (InvalidOperationException e)
+            {
+                Assert.Fail($"Expected no exception, but got: {e}");
+            }
+        }
+
+        internal class Stuff
+        {
+            public Stuff(Hub hub)
+            {
+                hub.Subscribe(new Action<Event>(a => { }));
+            }
+        }
+
+        [TestMethod]
         public void Subscribe_AddsHandlerToList()
         {
             // arrange

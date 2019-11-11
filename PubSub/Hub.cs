@@ -180,7 +180,7 @@ namespace PubSub
             }
         }
 
-        private List<Handler> GetAliveHandlers<T>()
+        private IEnumerable<Handler> GetAliveHandlers<T>()
         {
             PruneHandlers();
             lock (_locker)
