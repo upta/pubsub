@@ -244,6 +244,13 @@ namespace PubSub.Tests
             _hub.Publish(42, token2); //should be true
             Assert.AreEqual(2, callCount);
             
+            _hub.Unsubscribe();  //This shouldn't unsubscribe anything
+            Assert.AreEqual(_hub._handlers.Count, 2);
+
+            _hub.Unsubscribe(token1);  //This should unsubscribe token1
+            Assert.AreEqual(_hub._handlers.Count, 1);
+
+
         }
     }
 
