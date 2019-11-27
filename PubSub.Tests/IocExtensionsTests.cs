@@ -9,8 +9,8 @@ namespace PubSub.Tests
         private IPubSubPipelineFactory pubSubFactory;
         private ISubscriber subscriber;
         private IPublisher publisher;
-        private object sender;
-        private object preservedSender;
+        private string sender;
+        private string preservedSender;
 
         [TestInitialize]
         public void Setup()
@@ -18,8 +18,8 @@ namespace PubSub.Tests
             pubSubFactory = new PubSubPipelineFactory();
             subscriber = pubSubFactory.GetSubscriber();
             publisher = pubSubFactory.GetPublisher();
-            sender = new object();
-            preservedSender = new object();
+            sender = "sender";
+            preservedSender = "preservedSender";
         }
         
         [TestMethod]

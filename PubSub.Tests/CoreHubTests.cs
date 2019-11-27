@@ -226,6 +226,25 @@ namespace PubSub.Tests
             // assert
             Assert.AreEqual(10, callCount);
         }
+
+        [TestMethod]
+        public void PubSubWithToken()
+        {
+            var callCount = 0;
+            string token1 = "token1";
+            string token2 = "token2";
+            _hub.Subscribe<bool>((b) => { callCount++;},token1);
+            _hub.Subscribe<int>((i)=>callCount++,token2);
+
+            _hub.Publish(true);  //There is no token with ""
+            _hub.Publish(true, token2); //There is no token2 with bool
+            _hub.Publish(true, token1); //should be true
+
+            Assert.AreEqual(1, callCount);
+            _hub.Publish(42, token2); //should be true
+            Assert.AreEqual(2, callCount);
+            
+        }
     }
 
     public class Event

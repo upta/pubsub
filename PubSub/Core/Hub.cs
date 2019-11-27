@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace PubSub
@@ -13,10 +14,15 @@ namespace PubSub
         private static Hub _default;
 
         public static Hub Default => _default ?? (_default = new Hub());
-        
-        public void Publish<T>(T data = default(T))
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data">The object we want to publish</param>
+        /// <param name="token">A token that we will filter on.</param>
+        public void Publish<T>(T data = default, string token = "")
         {
-            foreach (var handler in GetAliveHandlers<T>())
+            foreach (Handler handler in GetAliveHandlers<T>(token))
             {
                 switch (handler.Action)
                 {
@@ -30,9 +36,9 @@ namespace PubSub
             }
         }
 
-        public async Task PublishAsync<T>(T data = default(T))
+        public async Task PublishAsync<T>(T data = default, string token = "")
         {
-            foreach (var handler in GetAliveHandlers<T>())
+            foreach (var handler in GetAliveHandlers<T>(token))
             {
                 switch (handler.Action)
                 {
@@ -51,40 +57,40 @@ namespace PubSub
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler"></param>
-        public void Subscribe<T>(Action<T> handler)
+        /// <param name="token"></param>
+        public void Subscribe<T>(Action<T> handler, string token = "")
         {
-            Subscribe(this, handler);
+            Subscribe(this, handler, token);
         }
 
-        public void Subscribe<T>(object subscriber, Action<T> handler)
+        public void Subscribe<T>(object subscriber, Action<T> handler, string token = "")
         {
-            SubscribeDelegate<T>(subscriber, handler);
+            SubscribeDelegate<T>(subscriber, handler, token);
         }
 
-        public void Subscribe<T>(Func<T, Task> handler)
+        public void Subscribe<T>(Func<T, Task> handler, string token = "")
         {
-            Subscribe(this, handler);
+            Subscribe(this, handler, token);
         }
 
-        public void Subscribe<T>(object subscriber, Func<T, Task> handler)
+        public void Subscribe<T>(object subscriber, Func<T, Task> handler, string token = "")
         {
-            SubscribeDelegate<T>(subscriber, handler);
+            SubscribeDelegate<T>(subscriber, handler, token);
         }
 
         /// <summary>
         ///     Allow unsubscribing directly to this Hub.
         /// </summary>
-        public void Unsubscribe()
+        public void Unsubscribe(string token = "")
         {
-            Unsubscribe(this);
+            Unsubscribe(this, token);
         }
 
-        public void Unsubscribe(object subscriber)
+        public void Unsubscribe(object subscriber, string token = "")
         {
             lock (_locker)
             {
-                var query = _handlers.Where(a => !a.Sender.IsAlive ||
-                                                a.Sender.Target.Equals(subscriber));
+                var query = _handlers.Where(a => !a.Sender.IsAlive || a.Sender.Target.Equals(subscriber) && a.Token == token);
 
                 foreach (var h in query.ToList())
                     _handlers.Remove(h);
@@ -105,18 +111,16 @@ namespace PubSub
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler"></param>
-        public void Unsubscribe<T>(Action<T> handler)
+        public void Unsubscribe<T>(Action<T> handler, string token = "")
         {
-            Unsubscribe(this, handler);
+            Unsubscribe(this, handler, token);
         }
 
-        public void Unsubscribe<T>(object subscriber, Action<T> handler = null)
+        public void Unsubscribe<T>(object subscriber, Action<T> handler = null, string token = "")
         {
             lock (_locker)
             {
-                var query = _handlers.Where(a => !a.Sender.IsAlive ||
-                                                a.Sender.Target.Equals(subscriber) && a.Type == typeof(T));
-
+                var query = _handlers.Where(a => !a.Sender.IsAlive || (a.Sender.Target.Equals(subscriber) && a.Type == typeof(T) && a.Token == token));
                 if (handler != null)
                     query = query.Where(a => a.Action.Equals(handler));
 
@@ -125,19 +129,19 @@ namespace PubSub
             }
         }
 
-        public bool Exists<T>()
+        public bool Exists<T>(string token = "")
         {
-            return Exists<T>(this);
+            return Exists<T>(this, token);
         }
 
-        public bool Exists<T>(object subscriber)
+        public bool Exists<T>(object subscriber, string token = "")
         {
             lock (_locker)
             {
                 foreach (var h in _handlers)
                 {
                     if (Equals(h.Sender.Target, subscriber) &&
-                         typeof(T) == h.Type)
+                         typeof(T) == h.Type && h.Token == token)
                     {
                         return true;
                     }
@@ -147,7 +151,7 @@ namespace PubSub
             return false;
         }
 
-        public bool Exists<T>(object subscriber, Action<T> handler)
+        public bool Exists<T>(object subscriber, Action<T> handler, string token = "")
         {
             lock (_locker)
             {
@@ -155,7 +159,7 @@ namespace PubSub
                 {
                     if (Equals(h.Sender.Target, subscriber) &&
                          typeof(T) == h.Type &&
-                         h.Action.Equals(handler))
+                         h.Action.Equals(handler) && h.Token.Equals(token))
                     {
                         return true;
                     }
@@ -165,13 +169,14 @@ namespace PubSub
             return false;
         }
 
-        private void SubscribeDelegate<T>(object subscriber, Delegate handler)
+        private void SubscribeDelegate<T>(object subscriber, Delegate handler, string token)
         {
             var item = new Handler
             {
                 Action = handler,
                 Sender = new WeakReference(subscriber),
-                Type = typeof(T)
+                Type = typeof(T),
+                Token = token
             };
 
             lock (_locker)
@@ -180,10 +185,13 @@ namespace PubSub
             }
         }
 
-        private IEnumerable<Handler> GetAliveHandlers<T>()
+        private IEnumerable<Handler> GetAliveHandlers<T>(string token)
         {
             PruneHandlers();
-            return _handlers.Where(h => h.Type.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()));
+            lock (_locker)
+            {
+                return _handlers.Where(h => h.Type.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()) && h.Token == token);
+            }
         }
 
         private void PruneHandlers()
@@ -203,6 +211,8 @@ namespace PubSub
             public Delegate Action { get; set; }
             public WeakReference Sender { get; set; }
             public Type Type { get; set; }
+            public string Token { get; set; } = "";
+
         }
     }
 }
