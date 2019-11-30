@@ -72,12 +72,10 @@ public class Page
 ```
 
 ### Some explanation
-To keep things simple, yet flexible, PubSub PCL is implemented using two core ideas:
+To keep things simple, yet flexible, PubSub PCL is implemented using core ideas:
 * Different kinds of messages are delineated by CLR type.
 	- This avoids the need to have a list of string constants (or just magic strings), enums, whatever to define what you want to listen for/send.
 	- This gives us nice strongly-typed data that can be passed from our Publish methods to our Subscribe handlers (i.e. Product above)
-* All interaction with the PubSub system is done through extention methods on System.Object (e.g. Publish, Subscribe and Unsubscribe)
-	- This allows for a zero-setup system, you can simply Subscribe on any object and Publish away
 
 ### Get it on Nuget
 
