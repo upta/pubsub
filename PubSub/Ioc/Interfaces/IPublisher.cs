@@ -2,6 +2,6 @@
 {
     public interface IPublisher
     {
-        void Publish<T>(T data);
+        void Publish<T>(T data, string token = "");
     }
 }
