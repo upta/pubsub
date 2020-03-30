@@ -180,10 +180,10 @@ namespace PubSub
             }
         }
 
-        private IEnumerable<Handler> GetAliveHandlers<T>()
+        private List<Handler> GetAliveHandlers<T>()
         {
             PruneHandlers();
-            return _handlers.Where(h => h.Type.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()));
+            return _handlers.Where(h => h.Type.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo())).ToList();
         }
 
         private void PruneHandlers()
