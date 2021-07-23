@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>strong-name.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
 </Project>
