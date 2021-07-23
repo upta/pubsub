@@ -97,7 +97,7 @@ namespace PubSub
         /// <typeparam name="T"></typeparam>
         public void Unsubscribe<T>()
         {
-            Unsubscribe<T>(this);
+            Unsubscribe<T>(this, (Delegate) null);
         }
 
         /// <summary>
@@ -111,11 +111,17 @@ namespace PubSub
         }
 
         public void Unsubscribe<T>(object subscriber, Action<T> handler = null)
+            => Unsubscribe<T>(subscriber, (Delegate) handler);
+
+        public void Unsubscribe<T>(object subscriber, Func<T, Task> handler = null)
+            => Unsubscribe<T>(subscriber, (Delegate) handler);
+
+        private void Unsubscribe<T>(object subscriber, Delegate handler = null)
         {
             lock (_locker)
             {
-                var query = _handlers.Where(a => !a.Sender.IsAlive ||
-                                                a.Sender.Target.Equals(subscriber) && a.Type == typeof(T));
+                var query = _handlers.Where(a => a.Sender.Target != null &&
+                                                 (!a.Sender.IsAlive || a.Sender.Target.Equals(subscriber) && a.Type == typeof(T)));
 
                 if (handler != null)
                     query = query.Where(a => a.Action.Equals(handler));

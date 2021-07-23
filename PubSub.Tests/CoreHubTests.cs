@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PubSub.Tests
@@ -125,7 +126,7 @@ namespace PubSub.Tests
             _hub.Subscribe(_preservedSubscriber, new Action<string>(a => { }));
 
             // act
-            _hub.Unsubscribe<string>(_subscriber);
+            _hub.Unsubscribe<string>(_subscriber, (Action<string>) null);
 
             // assert
             Assert.IsFalse(_hub._handlers.Any(a => a.Sender.Target == _subscriber));
@@ -171,7 +172,7 @@ namespace PubSub.Tests
             GC.Collect();
 
             // act
-            _hub.Unsubscribe<string>(_subscriber);
+            _hub.Unsubscribe<string>(_subscriber, (Action<string>)null);
 
             // assert
             // TODO: Figure out why net5 breaks this: Assert.AreEqual(0, _hub._handlers.Count);
