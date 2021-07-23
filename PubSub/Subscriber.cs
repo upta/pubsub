@@ -1,20 +1,19 @@
 ﻿using System;
+using System.Threading.Tasks;
 using PubSub.Abstractions;
 
 namespace PubSub
 {
     public class Subscriber : ISubscriber
     {
-        private readonly Hub hub;
+        private readonly Hub _hub;
 
         public Subscriber( Hub hub )
         {
-            this.hub = hub;
+            _hub = hub;
         }
 
-        public bool Exists<T>( object subscriber ) => hub.Exists<T>( subscriber );
 
-        public bool Exists<T>( object subscriber, Action<T> handler ) => hub.Exists( subscriber, handler );
 
         public void Subscribe<T>( object subscriber, Action<T> handler ) => hub.Subscribe( subscriber, handler );
 
