@@ -5,7 +5,6 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{C73D1486-C5C4-4BF0-AE0B-D0A214E2CCB9}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>netstandard1.1;netstandard2.0</TargetFrameworks>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
@@ -25,6 +24,8 @@
     <DelaySign>false</DelaySign>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <FileVersion>3.0.0.0</FileVersion>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>9</LangVersion>
     <!--End of Nuspec metadata-->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
