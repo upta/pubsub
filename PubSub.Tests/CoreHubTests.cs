@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PubSub.Tests
@@ -16,7 +17,7 @@ namespace PubSub.Tests
         [TestInitialize]
         public void Setup()
         {
-            _hub = new Hub();
+            _hub = new Hub(new NullLogger<Hub>());
             _subscriber = new object();
             _condemnedSubscriber = new object();
             _preservedSubscriber = new object();
@@ -173,7 +174,7 @@ namespace PubSub.Tests
             // arrange
             var callCount = 0;
             var action = new Action<Event>(a => callCount++);
-            var myhub = new Hub();
+            var myhub = new Hub(new NullLogger<Hub>());
 
             // this lies and subscribes to the static hub instead.
             myhub.Subscribe(this, new Action<Event>(a => callCount++));

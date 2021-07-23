@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace PubSub
 {
@@ -11,19 +11,32 @@ namespace PubSub
     {
         internal readonly List<Handler> _handlers = new();
         private readonly object _lock = new();
+        private readonly ILogger<Hub> _logger;
+
+        public Hub(ILogger<Hub> logger)
+        {
+            _logger = logger;
+        }
 
         public async Task PublishAsync<T>(T data = default)
         {
             foreach (var handler in GetAliveHandlers<T>())
             {
-                switch (handler.Action)
+                try
                 {
-                    case Action<T> action:
-                        action(data);
-                        break;
-                    case Func<T, Task> func:
-                        await func(data);
-                        break;
+                    switch (handler.Action)
+                    {
+                        case Action<T> action:
+                            action(data);
+                            break;
+                        case Func<T, Task> func:
+                            await func(data);
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Could not deliver message of type {typeof(T)} to subscriber of type {handler.Sender.Target?.GetType()}");
                 }
             }
         }

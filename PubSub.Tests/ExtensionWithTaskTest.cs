@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PubSub.Tests
@@ -11,7 +12,7 @@ namespace PubSub.Tests
         [TestMethod]
         public async Task Subscribe_With_Action_And_Func_Publish_All_Async()
         {
-            var hub = new Hub();
+            var hub = new Hub(new NullLogger<Hub>());
             var callCount = 0;
 
             hub.Subscribe(this, new Action<Event>(a => callCount++));

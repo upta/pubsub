@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PubSub.Abstractions;
 
@@ -17,7 +18,7 @@ namespace PubSub.Tests
         [TestInitialize]
         public void Setup()
         {
-            _hub = new Hub();
+            _hub = new Hub(new NullLogger<Hub>());
             _subscriber = new Subscriber(_hub);
             _publisher = new Publisher(_hub);
             _sender = new object();
