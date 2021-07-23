@@ -22,10 +22,11 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>strong-name.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <FileVersion>3.0.0.0</FileVersion>
+    <AssemblyVersion>5.0.0.0</AssemblyVersion>
+    <FileVersion>5.0.0.0</FileVersion>
     <TargetFramework>net5.0</TargetFramework>
     <LangVersion>9</LangVersion>
+    <PackageVersion>5.0.0</PackageVersion>
     <!--End of Nuspec metadata-->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
