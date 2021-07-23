@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PubSub
+namespace PubSub.Abstractions
 {
     public interface ISubscriber
     {

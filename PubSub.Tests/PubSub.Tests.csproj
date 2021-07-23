@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PubSub\PubSub.csproj" />
+    <ProjectReference Include="..\PubSub.Abstractions\PubSub.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

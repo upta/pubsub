@@ -1,4 +1,4 @@
-﻿namespace PubSub
+﻿namespace PubSub.Abstractions
 {
     public interface IPublisher
     {

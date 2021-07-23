@@ -1,4 +1,6 @@
-﻿namespace PubSub
+﻿using PubSub.Abstractions;
+
+namespace PubSub
 {
     public class Publisher : IPublisher
     {
