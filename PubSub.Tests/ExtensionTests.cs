@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PubSub.Tests
@@ -6,98 +7,58 @@ namespace PubSub.Tests
     [TestClass]
     public class ExtensionTests
     {
-        [TestMethod]
-        public void Exists_Static()
-        {
-            var hub = new Hub();
-            var action = new Action<string>(a => { });
-            hub.Subscribe(action);
-
-            // act
-            var exists = hub.Exists<string>();
-
-            // assert
-            Assert.IsTrue(exists);
-
-            hub.Unsubscribe(action);
-        }
 
         [TestMethod]
-        public void NotExists_Static()
-        {
-            var hub = new Hub();
-            var action = new Action<bool>(a => { });
-            hub.Subscribe(action);
-
-            // act
-            var exists = hub.Exists<string>();
-
-            // assert
-            Assert.IsFalse(exists);
-
-            hub.Unsubscribe(action);
-        }
-
-        [TestMethod]
-        public void PublishExtensions()
+        public async Task PublishExtensions()
         {
             var hub = new Hub();
             var callCount = 0;
 
-            hub.Subscribe(new Action<Event>(a => callCount++));
-            hub.Subscribe(new Action<Event>(a => callCount++));
+            hub.Subscribe(this, new Action<Event>(a => callCount++));
+            hub.Subscribe(this, new Action<Event>(a => callCount++));
 
             // act
-            hub.Publish(new Event());
-            hub.Publish(new SpecialEvent());
-            hub.Publish<Event>();
+            await hub.PublishAsync(new Event());
+            await hub.PublishAsync(new SpecialEvent());
+            await hub.PublishAsync<Event>();
 
             // assert
             Assert.AreEqual(6, callCount);
         }
 
         [TestMethod]
-        public void UnsubscribeExtensions()
+        public async Task UnsubscribeExtensions()
         {
             var hub = new Hub();
             var callCount = 0;
             var action = new Action<Event>(a => callCount++);
 
-            hub.Subscribe(new Action<Event>(a => callCount++));
-            hub.Subscribe(new Action<SpecialEvent>(a => callCount++));
-            hub.Subscribe(action);
+            hub.Subscribe(this, new Action<Event>(a => callCount++));
+            hub.Subscribe(this, new Action<SpecialEvent>(a => callCount++));
+            hub.Subscribe(this, action);
 
             // act
-            hub.Publish(new Event());
-            hub.Publish(new SpecialEvent());
-            hub.Publish<Event>();
+            await hub.PublishAsync(new Event());
+            await hub.PublishAsync(new SpecialEvent());
+            await hub.PublishAsync<Event>();
 
             // assert
             Assert.AreEqual(7, callCount);
 
             // unsubscribe
-            hub.Unsubscribe<SpecialEvent>();
+            hub.Unsubscribe<SpecialEvent>(this);
 
             // act
-            hub.Publish<SpecialEvent>();
+            await hub.PublishAsync<SpecialEvent>();
 
             // assert
             Assert.AreEqual(9, callCount);
 
             // unsubscribe specific action
-            hub.Unsubscribe(action);
+            hub.Unsubscribe(this, action);
 
             // act
-            hub.Publish<SpecialEvent>();
-
-            // assert
-            Assert.AreEqual(10, callCount);
-
-            // unsubscribe from all
-            hub.Unsubscribe();
-
-            // act
-            hub.Publish<SpecialEvent>();
+            await hub.PublishAsync<SpecialEvent>();
 
             // assert
             Assert.AreEqual(10, callCount);

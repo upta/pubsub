@@ -23,7 +23,7 @@ namespace PubSub.Tests
         }
         
         [TestMethod]
-        public void Publish_CallsAllRegisteredActions()
+        public async Task Publish_CallsAllRegisteredActions()
         {
             // arrange
             var callCount = 0;
@@ -31,14 +31,14 @@ namespace PubSub.Tests
             _hub.Subscribe(new object(), new Action<string>(a => callCount++));
 
             // act
-            _hub.Publish(default(string));
+            await _hub.PublishAsync(default(string));
 
             // assert
             Assert.AreEqual(2, callCount);
         }
 
         [TestMethod]
-        public void Publish_SpecialEvent_CaughtByBase()
+        public async Task Publish_SpecialEvent_CaughtByBase()
         {
             // arrange
             var callCount = 0;
@@ -46,14 +46,14 @@ namespace PubSub.Tests
             _hub.Subscribe(_subscriber, new Action<Event>(a => callCount++));
 
             // act
-            _hub.Publish(new SpecialEvent());
+            await _hub.PublishAsync(new SpecialEvent());
 
             // assert
             Assert.AreEqual(2, callCount);
         }
 
         [TestMethod]
-        public void Publish_BaseEvent_NotCaughtBySpecial()
+        public async Task Publish_BaseEvent_NotCaughtBySpecial()
         {
             // arrange
             var callCount = 0;
@@ -61,7 +61,7 @@ namespace PubSub.Tests
             _hub.Subscribe(_subscriber, new Action<Event>(a => callCount++));
 
             // act
-            _hub.Publish(new Event());
+            await _hub.PublishAsync(new Event());
 
             // assert
             Assert.AreEqual(1, callCount);
@@ -69,7 +69,7 @@ namespace PubSub.Tests
 
 
         [TestMethod]
-        public void Publish_CleansUpBeforeSending()
+        public async Task Publish_CleansUpBeforeSending()
         {
             // arrange
             var liveSubscriber = new object();
@@ -81,7 +81,7 @@ namespace PubSub.Tests
             _condemnedSubscriber = null;
             GC.Collect();
 
-            _hub.Publish(default(string));
+            await _hub.PublishAsync(default(string));
 
             // assert
             // TODO: Figure out why net5 breaks this: Assert.AreEqual(1, _hub._handlers.Count);
@@ -148,17 +148,6 @@ namespace PubSub.Tests
         }
 
         [TestMethod]
-        public void Exists_EventDoesExist()
-        {
-            var action = new Action<string>(a => { });
-
-            _hub.Subscribe(_subscriber, action);
-
-            Assert.IsTrue(_hub.Exists(_subscriber, action));
-        }
-
-
-        [TestMethod]
         public void Unsubscribe_CleanUps()
         {
             // arrange
@@ -179,7 +168,7 @@ namespace PubSub.Tests
         }
 
         [TestMethod]
-        public void PubSubUnsubDirectlyToHub()
+        public async Task PubSubUnsubDirectlyToHub()
         {
             // arrange
             var callCount = 0;
@@ -187,57 +176,48 @@ namespace PubSub.Tests
             var myhub = new Hub();
 
             // this lies and subscribes to the static hub instead.
-            myhub.Subscribe(new Action<Event>(a => callCount++));
-            myhub.Subscribe(new Action<SpecialEvent>(a => callCount++));
-            myhub.Subscribe(action);
+            myhub.Subscribe(this, new Action<Event>(a => callCount++));
+            myhub.Subscribe(this,new Action<SpecialEvent>(a => callCount++));
+            myhub.Subscribe(this, action);
 
             // act
-            myhub.Publish(new Event());
-            myhub.Publish(new SpecialEvent());
-            myhub.Publish<Event>();
+            await myhub.PublishAsync(new Event());
+            await myhub.PublishAsync(new SpecialEvent());
+            await myhub.PublishAsync<Event>();
 
             // assert
             Assert.AreEqual(7, callCount);
 
             // unsubscribe
             // this lies and unsubscribes from the static hub instead.
-            myhub.Unsubscribe<SpecialEvent>();
+            myhub.Unsubscribe<SpecialEvent>(this);
 
             // act
-            myhub.Publish(new SpecialEvent());
+            await myhub.PublishAsync(new SpecialEvent());
 
             // assert
             Assert.AreEqual(9, callCount);
 
             // unsubscribe specific action
-            myhub.Unsubscribe(action);
+            myhub.Unsubscribe(this, action);
 
             // act
-            myhub.Publish(new SpecialEvent());
-
-            // assert
-            Assert.AreEqual(10, callCount);
-
-            // unsubscribe to all
-            myhub.Unsubscribe();
-
-            // act
-            myhub.Publish(new SpecialEvent());
+            await myhub.PublishAsync(new SpecialEvent());
 
             // assert
             Assert.AreEqual(10, callCount);
         }
 
         [TestMethod]
-        public void Publish_NoExceptionRaisedWhenHandlerCreatesNewSubscriber()
+        public async Task Publish_NoExceptionRaisedWhenHandlerCreatesNewSubscriber()
         {
             // arrange
-            _hub.Subscribe(new Action<Event>(a => new Stuff(_hub)));
+            _hub.Subscribe(this, new Action<Event>(a => new Stuff(_hub)));
 
             // act
             try
             {
-                _hub.Publish(new Event());
+                await _hub.PublishAsync(new Event());
             }
 
             // assert
@@ -247,11 +227,11 @@ namespace PubSub.Tests
             }
         }
 
-        internal class Stuff
+        private class Stuff
         {
             public Stuff(Hub hub)
             {
-                hub.Subscribe(new Action<Event>(a => { }));
+                hub.Subscribe(this, new Action<Event>(a => { }));
             }
         }
     }

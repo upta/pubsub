@@ -23,7 +23,7 @@ namespace PubSub
             => _hub.Unsubscribe(subscriber);
 
         public void Unsubscribe<T>(object subscriber)
-            => _hub.Unsubscribe(subscriber, (Action<T>) null);
+            => _hub.Unsubscribe(subscriber);
 
         public void Unsubscribe<T>(object subscriber, Action<T> handler)
             => _hub.Unsubscribe(subscriber, handler);
