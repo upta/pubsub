@@ -4,6 +4,12 @@
         <TargetFramework>net5.0</TargetFramework>
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>strong-name.snk</AssemblyOriginatorKeyFile>
+        <PackageId>dt.PubSub.Abstractions</PackageId>
+        <Authors>tobuto</Authors>
+        <Description>Abstractions for the dt.PubSub library</Description>
+        <PackageProjectUrl>https://github.com/devterm-its/pubsub</PackageProjectUrl>
+        <PackageTags>portable;pubsub;eventaggregator;c#</PackageTags>
+        <Title>dt.PubSub dotnet Abstractions</Title>
     </PropertyGroup>
 
 </Project>
