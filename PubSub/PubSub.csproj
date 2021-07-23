@@ -10,13 +10,13 @@
     </UpgradeBackupLocation>
     <OldToolsVersion>12.0</OldToolsVersion>
     <!--Start of Nuspec metadata-->
-    <PackageId>PubSub</PackageId>
-    <Title>PubSub dotnet</Title>
-    <Authors>upta</Authors>
-    <PackageProjectUrl>http://github.com/upta/pubsub</PackageProjectUrl>
+    <PackageId>dt.PubSub</PackageId>
+    <Title>dt.PubSub dotnet</Title>
+    <Authors>tobuto, upta</Authors>
+    <PackageProjectUrl>http://github.com/devterm-its/pubsub</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageTags>portable;pubsub;eventaggregator;c#</PackageTags>
-    <Description>An extremely light-weight, easy to use .Net pub/sub library</Description>
+    <Description>An extremely light-weight, easy to use .Net pub/sub library based on upta/pubsub</Description>
     <Version>4.0.0</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <SignAssembly>true</SignAssembly>
