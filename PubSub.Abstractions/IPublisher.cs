@@ -1,7 +1,9 @@
-﻿namespace PubSub.Abstractions
+﻿using System.Threading.Tasks;
+
+namespace PubSub.Abstractions
 {
     public interface IPublisher
     {
-        void Publish<T>(T data);
+        Task PublishAsync<T>(T data);
     }
 }

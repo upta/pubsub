@@ -1,16 +1,17 @@
-﻿using PubSub.Abstractions;
+﻿using System.Threading.Tasks;
+using PubSub.Abstractions;
 
 namespace PubSub
 {
     public class Publisher : IPublisher
     {
-        private readonly Hub hub;
+        private readonly Hub _hub;
 
         public Publisher( Hub hub )
         {
-            this.hub = hub;
+            _hub = hub;
         }
 
-        public void Publish<T>(T data) => hub.Publish(data);
+        public async Task PublishAsync<T>(T data) => await _hub.PublishAsync(data);
     }
 }

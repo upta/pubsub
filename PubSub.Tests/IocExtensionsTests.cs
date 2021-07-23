@@ -23,13 +23,13 @@ namespace PubSub.Tests
         }
         
         [TestMethod]
-        public void Publish_Over_Interface_Calls_All_Subscribers()
+        public async void Publish_Over_Interface_Calls_All_Subscribers()
         {
             var callCount = 0;
             subscriber.Subscribe<Event>(sender, a => callCount++);
             subscriber.Subscribe(sender, new Action<Event>(a => callCount++));
 
-            publisher.Publish(new SpecialEvent());
+            await publisher.PublishAsync(new SpecialEvent());
 
             Assert.AreEqual(2, callCount);
         }
