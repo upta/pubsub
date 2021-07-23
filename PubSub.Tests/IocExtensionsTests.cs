@@ -6,7 +6,6 @@ namespace PubSub.Tests
     [TestClass]
     public class IocExtensionsTests
     {
-        private IPubSubPipelineFactory pubSubFactory;
         private ISubscriber subscriber;
         private IPublisher publisher;
         private object sender;
@@ -15,9 +14,9 @@ namespace PubSub.Tests
         [TestInitialize]
         public void Setup()
         {
-            pubSubFactory = new PubSubPipelineFactory();
-            subscriber = pubSubFactory.GetSubscriber();
-            publisher = pubSubFactory.GetPublisher();
+            var hub = new Hub();
+            subscriber = new Subscriber(hub);
+            publisher = new Publisher(hub);
             sender = new object();
             preservedSender = new object();
         }
