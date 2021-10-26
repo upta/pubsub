@@ -79,12 +79,20 @@ namespace PubSub
             Unsubscribe(this);
         }
 
-        public void Unsubscribe(object subscriber)
+        public void Unsubscribe(Delegate handler)
+        {
+            Unsubscribe(this, handler);
+        }
+
+        public void Unsubscribe(object subscriber, Delegate handler = null)
         {
             lock (_locker)
             {
                 var query = _handlers.Where(a => !a.Sender.IsAlive ||
                                                 a.Sender.Target.Equals(subscriber));
+
+                if (handler != null)
+                    query = query.Where(a => a.Action.Equals(handler));
 
                 foreach (var h in query.ToList())
                     _handlers.Remove(h);
@@ -105,12 +113,12 @@ namespace PubSub
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler"></param>
-        public void Unsubscribe<T>(Action<T> handler)
+        public void Unsubscribe<T>(Delegate handler)
         {
             Unsubscribe(this, handler);
         }
 
-        public void Unsubscribe<T>(object subscriber, Action<T> handler = null)
+        public void Unsubscribe<T>(object subscriber, Delegate handler = null)
         {
             lock (_locker)
             {
