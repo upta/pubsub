@@ -79,6 +79,11 @@ namespace PubSub
             Unsubscribe(this);
         }
 
+        /// <summary>
+        ///     Allow unsubscribing directly to this Hub.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="handler"></param>
         public void Unsubscribe(Delegate handler)
         {
             Unsubscribe(this, handler);
@@ -106,16 +111,6 @@ namespace PubSub
         public void Unsubscribe<T>()
         {
             Unsubscribe<T>(this);
-        }
-
-        /// <summary>
-        ///     Allow unsubscribing directly to this Hub.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="handler"></param>
-        public void Unsubscribe<T>(Delegate handler)
-        {
-            Unsubscribe(this, handler);
         }
 
         public void Unsubscribe<T>(object subscriber, Delegate handler = null)
