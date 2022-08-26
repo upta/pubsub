@@ -133,6 +133,15 @@ namespace PubSub
             }
         }
 
+        /// <summary>
+        ///     Check if any of type T are subscribed to this Hub.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>A bool indicating the presence of one or more subscribers of type T</returns>
+        public bool Any<T>() {
+            return GetAliveHandlers<T>().Any(handler => typeof(T) == handler.Type);
+        }
+
         public bool Exists<T>()
         {
             return Exists<T>(this);

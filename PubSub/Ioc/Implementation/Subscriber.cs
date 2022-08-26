@@ -11,6 +11,8 @@ namespace PubSub
             this.hub = hub;
         }
 
+        public bool Any<T>() => hub.Any<T>();
+        
         public bool Exists<T>( object subscriber ) => hub.Exists<T>( subscriber );
 
         public bool Exists<T>( object subscriber, Action<T> handler ) => hub.Exists( subscriber, handler );
