@@ -246,6 +246,70 @@ namespace PubSub.Tests
             }
         }
 
+        [TestMethod]
+        public void Any_DetectsSubscriber() {
+            // arrange
+            _hub.Subscribe(new Action<Event>(a => { }));
+
+            // act
+            var typeExists = _hub.Any<Event>();
+
+            // assert
+            Assert.IsTrue(typeExists);
+        }
+
+        [TestMethod]
+        public void Any_DetectsSubscribers() {
+            // arrange
+            var actionOne = new Action<Event>(a => { });
+            var actionTwo = new Action<Event>(a => { });
+            var actionthree = new Action<SpecialEvent>(a => { });
+
+            _hub.Subscribe(actionOne);
+            _hub.Subscribe(actionTwo);
+            _hub.Subscribe(actionthree);
+
+            // act
+            var typeExists = _hub.Any<Event>();
+            var typeExistsSpecial = _hub.Any<SpecialEvent>();
+
+            // assert
+            Assert.IsTrue(typeExists);
+            Assert.IsTrue(typeExistsSpecial);
+        }
+
+        [TestMethod]
+        public void Any_DetectsSubscriberAfterOneRemoved() {
+            // arrange
+            var actionOne = new Action<Event>(a => { });
+            var actionTwo = new Action<Event>(a => { });
+
+            _hub.Subscribe(actionOne);
+            _hub.Subscribe(actionTwo);
+
+            // act
+            _hub.Unsubscribe(actionOne);
+            var typeExists = _hub.Any<Event>();
+
+            // assert
+            Assert.IsTrue(typeExists);
+        }
+
+        [TestMethod]
+        public void Any_DoesNotDetectSubscriber() {
+            // arrange
+            var actionOne = new Action<Event>(a => { });
+
+            // act
+            _hub.Subscribe(actionOne);
+            _hub.Publish<Event>();
+            _hub.Unsubscribe(actionOne);
+            var typeExists = _hub.Any<Event>();
+
+            // assert
+            Assert.IsFalse(typeExists);
+        }
+
         internal class Stuff
         {
             public Stuff(Hub hub)
